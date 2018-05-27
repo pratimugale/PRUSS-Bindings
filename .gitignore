@@ -11,3 +11,5 @@ __pycache__/
 
 # Swig Intermediate Files
 *_wrap.c
+*_wrap.cxx
+*.gch
