@@ -1,4 +1,4 @@
-#swig
+# swig
 Swig is a tool to generate language bindings. It can be used to create interfaces for C/C++ code in various languages.
 
 ## Description
