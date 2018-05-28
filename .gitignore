@@ -17,6 +17,9 @@ __pycache__/
 
 gen/
 
+# Perl module
+*.pm
+
 # Distribution / Packaging
 .Python
 build/
