@@ -25,3 +25,11 @@ bash generate.sh -perl
 ```
 bash generate.sh -lua
 ```
+### ruby
+```
+bash generate.sh -ruby
+```
+### tcl
+```
+bash generate.sh -tcl
+```
