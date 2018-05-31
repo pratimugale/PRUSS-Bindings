@@ -1,6 +1,6 @@
 # High Level API Specification
 
-![UML Diagram](https://raw.githubusercontent.com/MuneebMohammed/PRUSS-Bindings/master/Documentation/uml.png)
+![UML Diagram](https://raw.githubusercontent.com/MuneebMohammed/PRUSS-Bindings/master/Documentation/uml_modified.png)
  
 ## `class PRUSS`
 The parent class which encapsulates the PRU-ICSS on the Beaglebone. It is a composition of two instances of the `PRU` class.
