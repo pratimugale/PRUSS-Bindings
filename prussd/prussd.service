@@ -1,0 +1,10 @@
+[Unit]
+Description = Service for PRU Access
+
+[Service]
+ExecStart=/root/prudaemon.py
+StandardOutput=null
+
+[Install]
+WantedBy=multi-user.target
+Alias=prussd.service
