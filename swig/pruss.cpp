@@ -2,6 +2,50 @@
 
 using namespace std;
 
+int socket_init()
+{
+	char* socket_path = "/tmp/prusocket"; //the path of the socket file
+	struct sockaddr_un addr;  //socket address struct 
+	int sockfd; // the file descriptor for the socket connection
+	
+	// get a socket to work with. The socket will be a unix domain stream socket
+	if( (sockfd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1 ) {
+		return -1;
+	}
+	
+	//fill the socket address struct with family name and socket path
+	memset(&addr, 0, sizeof(addr));
+	addr.sun_family = AF_UNIX;
+	strncpy(addr.sun_path, socket_path, sizeof(addr.sun_path)-1);
+	
+	//connect to the socket address
+	if(connect(sockfd, (struct sockaddr*)&addr, sizeof(addr)) == -1){
+		return -1;
+	}
+	return sockfd;
+}
+
+string socket_send(int fd, string command)
+{
+	int nbytes;
+	string received;
+	char buf[256], rec[256]; //buffers to store command and reply
+	nbytes = snprintf(buf, sizeof(buf), command); //store command in buf
+	buf[nbytes] = '\n';
+	send(fd, buf, strlen(buf), 0); // send command over the socket connection
+
+	nbytes = recv(fd, rec, sizeof(rec), 0); // receive reply from server
+	rec[nbytes] = '\0'; // string boundary
+	received = std::string(rec); // convert char* to string
+
+	return received;
+}
+
+void socket_close(int fd)
+{
+	close(fd);
+}
+
 PRU::PRU(int number)
 {
 	if(number != 0 &&  number != 1)
