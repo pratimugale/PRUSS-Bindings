@@ -2,7 +2,9 @@
 Description = Service for PRU Access
 
 [Service]
-ExecStart=/root/prudaemon.py
+Type=simple
+ExecStart=/usr/bin/python3 /home/debian/PRUSS-Bindings/prussd/prudaemon.py
+ExecStopPost=/bin/sh -c 'rm /tmp/prusocket'
 StandardOutput=null
 
 [Install]
