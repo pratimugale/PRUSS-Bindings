@@ -2,235 +2,219 @@
 
 using namespace std;
 
-int socket_init()
+Sock::Sock()
 {
-	char* socket_path = "/tmp/prusocket"; //the path of the socket file
-	struct sockaddr_un addr;  //socket address struct 
-	int sockfd; // the file descriptor for the socket connection
+	this->fd = -1;
+	this->socketpath = "/tmp/prusocket";
+}
+
+bool Sock::conn()
+{
 	
 	// get a socket to work with. The socket will be a unix domain stream socket
-	if( (sockfd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1 ) {
-		return -1;
-	}
+	this->fd = socket(AF_UNIX, SOCK_STREAM, 0);
 	
 	//fill the socket address struct with family name and socket path
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
-	strncpy(addr.sun_path, socket_path, sizeof(addr.sun_path)-1);
+	strncpy(this->addr.sun_path, socketpath, sizeof(addr.sun_path)-1);
 	
 	//connect to the socket address
-	if(connect(sockfd, (struct sockaddr*)&addr, sizeof(addr)) == -1){
-		return -1;
-	}
-	return sockfd;
+	if(connect(fd, (struct sockaddr*)&addr, sizeof(addr)) == -1)
+		return false;
+	
+	return true;
 }
 
-string socket_send(int fd, string command)
+string Sock::sendcmd(string command)
 {
+	if(!this->conn()) // Connect to the socket 
+		return to_string(ECONNREFUSED);
+	
 	int nbytes;
 	string received;
-	char buf[256], rec[256]; //buffers to store command and reply
-	nbytes = snprintf(buf, sizeof(buf), command); //store command in buf
+	char buf[1024], rec[1024]; //buffers to store command and reply
+	nbytes = snprintf(buf, sizeof(buf), command.c_str()); //store command in buf
 	buf[nbytes] = '\n';
-	send(fd, buf, strlen(buf), 0); // send command over the socket connection
+	send(this->fd, buf, strlen(buf), 0); // send command over the socket connection
 
-	nbytes = recv(fd, rec, sizeof(rec), 0); // receive reply from server
+	nbytes = recv(this->fd, rec, sizeof(rec), 0); // receive reply from server
 	rec[nbytes] = '\0'; // string boundary
 	received = std::string(rec); // convert char* to string
-
+	
+	this->disconn(); // disconnect from the socket connection
+	
 	return received;
 }
 
-void socket_close(int fd)
+void Sock::disconn()
 {
-	close(fd);
+	close(this->fd);
+	this->fd = -1;
+}
+
+PRUSS::PRUSS() : pru0(0), pru1(1)
+{
+	// boot up the PRUSS by probing the remoteproc driver
+	this->bootUp();
+	
+}
+
+bool PRUSS::isOn()
+{
+	return this->on;
+}
+
+int PRUSS::bootUp()
+{
+	if(this->on)
+		return EALREADY;
+	int ret = stoi(this->sock.sendcmd("probe_rproc")); //send command
+	if(!ret) {
+		this->on = true;
+		this->pru0.state = this->pru1.state = STOPPED; //PRU Cores are disabled after bootup
+	}
+	return ret; 
+}
+
+int PRUSS::shutDown()
+{
+	if(!this->on)
+		return EALREADY;
+	int ret = stoi(this->sock.sendcmd("unprobe_rproc"));
+	if(!ret) {
+		this->on = false;
+		this->pru0.state = this->pru1.state = NONE;
+	}
+	return ret;
+}
+
+void PRUSS::restart()
+{
+	this->shutDown();
+	this->bootUp();
 }
 
 PRU::PRU(int number)
 {
-	if(number != 0 &&  number != 1)
-	{
-		cerr << "Error Initialising the PRU: The PRU Core number can be 0 or 1 only\n";
-		exit (EXIT_FAILURE);
-	}
 	this->number = number;
-	this->sysfs = SYSFS_PATH + to_string(number + 1) + "/state";
-	this->set_channel(30 + number);
-
-	PRU::modprobe();
+	this->setChannel(); //set default channels 
 	this->reset();
 }
 
 PRU::PRU(int number, string fw)
 {
-	if(number != 0 && number != 1)
-	{
-		cerr << "Error Initialising the PRU: The PRU Core number can be 0 or 1 only\n";
-		exit(EXIT_FAILURE);
-	}
 	this->number = number;
-	this->set_channel(30 + number);
-	this->sysfs = SYSFS_PATH + to_string(number + 1) + "/state";
-
-	PRU::modprobe();
+	this->setChannel(); //set default channels
 	this->load(fw);
 }
 
-void PRU::modprobe()
+int PRU::enable()
 {
-	if(system("/sbin/modprobe pru_rproc"))
-	{
-		cerr << "Error probing the remoteproc driver\n";
-		exit(EXIT_FAILURE);
-	}
+	if(this->state == NONE)
+		return ENODEV;
+	if(this->state == RUNNING || this->state == HALTED)
+		return EALREADY;
+	int ret = stoi(this->sock.sendcmd("enable"+to_string(this->number)));
+	if(!ret)
+		this->state = RUNNING;
+	return ret;
 }
 
-void PRU::modunprobe()
+int PRU::disable()
 {
-	if(system("/sbin/modprobe -r pru_rproc"))
-	{
-		cerr << "Error removing the remoteproc driver\n";
-		exit(EXIT_FAILURE);
-	}
+	if(this->state == NONE)
+		return ENODEV;
+	if(this->state == STOPPED)
+		return EALREADY;
+	int ret = stoi(this->sock.sendcmd("disable"+to_string(this->number)));
+	if(!ret)
+		this->state = STOPPED;
+	return ret;
 }
 
-string PRU::get_state()
+int PRU::reset()
 {
-	string status;
-	ifstream statefile;
-	statefile.open (this->sysfs);
-	if(!(statefile.is_open()))
-	{
-		cerr << "Error fetching state\n";
-		exit(EXIT_FAILURE);
-	}
-	statefile >> status;
-	statefile.close();
-	return status;
+	this->disable(); 
+	return this->enable(); 
 }
 
-void PRU::enable()
+int PRU::pause()
 {
-	ofstream statefile;
-	statefile.open (this->sysfs);
-	if(this->get_state() == "offline")
-	{
-		if(!(statefile.is_open()))
-		{
-			cerr << "Error Enabling the PRU\n";
-			exit(EXIT_FAILURE);
-		}
-		statefile << "start";
-		statefile.close();
-		this->state = PRU_RUNNING;
-	}
+	if(this->state == NONE)
+		return ENODEV;
+	if(this->state == HALTED)
+		return EALREADY;
+	int ret = stoi(this->sock.sendcmd("pause"+to_string(this->number)));
+	if(!ret)
+		this->state = HALTED;
+	return ret;
 }
 
-void PRU::disable()
+int PRU::resume()
 {
-	ofstream statefile;
-	statefile.open (SYSFS_PATH + std::to_string(this->number + 1) + "/state");
-	if(this->get_state() == "running")
-	{
-		if(!(statefile.is_open()))
-		{
-			cerr << "Error Disabling the PRU\n";
-			exit(EXIT_FAILURE);
-		}
-		statefile << "stop";
-		statefile.close();
-		this->state = PRU_OFFLINE;
-	}
+	if(this->state == NONE || this->state == STOPPED)
+		return ENODEV;
+	if(this->state == RUNNING)
+		return EALREADY;
+	int ret = stoi(this->sock.sendcmd("resume"+to_string(this->number)));
+	if(!ret)
+		this->state = RUNNING;
+	return ret;
 }
 
-void PRU::reset()
+string PRU::showRegs()
+{
+	return this->sock.sendcmd("showregs" + to_string(this->number));
+}
+
+int PRU::load(string fw)
 {
 	this->disable();
+	if(system(("cp "+ fw + " /tmp/pru" + to_string(this->number)).c_str())) {
+		return ENOENT;	
+	}
+	int ret = stoi(this->sock.sendcmd("load" + to_string(this->number)));
 	this->enable();
+	return ret;
 }
 
-void PRU::load(string fw)
+void PRU::setChannel()
 {
-	this->disable();
-	if(system(("cp "+ fw + " " + FW_PATH + to_string(this->number) + "-fw").c_str()))
-	{
-		cerr << "Error loading firmware\n";
-		exit(EXIT_FAILURE);
-	}
-	this->enable();
+	this->channel = (this->number)?31:30;	
 }
 
-void PRU::set_channel(int ch)
+int PRU::setChannel(int channel)
 {
-	this->channel = RPMSG_PATH + to_string(ch);
+	if(channel < 0)
+		return EINVAL;
+	this->channel = channel;
+	return 0;
 }
 
-void PRU::send_msg(string msg)
+State PRU::getState()
 {
-	ofstream devfile ((this->channel).c_str());
-	if(!devfile)
-	{
-		cerr << "Error Opening Channel " << this->channel << '\n';
-		exit(EXIT_FAILURE);
-	}
-	devfile << msg;
-	devfile.close();
+	return this->state;
 }
 
-string PRU::get_msg()
+int PRU::sendMsg(string message)
 {
-	string msg;
-	ifstream devfile (this->channel);
-	if(!devfile)
-	{
-		std::cerr << "Error Opening Channel " << this->channel << '\n';
-		exit(EXIT_FAILURE);
-	}
-	devfile >> msg;
-	devfile.close();
-	return msg;
+	return stoi(this->sock.sendcmd("sendmsg " + to_string(this->channel) + " " + message)); // eg. sendmsg 31 hi!
 }
 
-void PRU::wait_for_event()
+string PRU::getMsg()
 {
-	ifstream devfile (this->channel);
-	if(!devfile)
-	{
-		std::cerr << "Error Opening " << this->channel << '\n';
-		exit(EXIT_FAILURE);
-	}
-	char tmp;
-	devfile >> tmp;
-	devfile.close();
+	return this->sock.sendcmd("getmsg " + to_string(this->channel));
 }
 
-void PRU::mem_writeint(int offset, unsigned int data)
+int PRU::waitForEvent()
 {
-	unsigned int * pru_addr = NULL;
-	int fd = open("/dev/mem", O_RDWR);
-	pru_addr = (unsigned int*)mmap(NULL, PRU_ICSS_LEN, PROT_READ | PROT_WRITE, MAP_SHARED, fd, PRU_ICSS);
-	if(pru_addr == MAP_FAILED)
-	{
-		cerr << "Failed to map PRU memory" << '\n';
-		exit(EXIT_FAILURE);
-	}
-	pru_addr[(this->number)?PRU_DRAM1:PRU_DRAM0] = data;
-	close(fd);
+	return stoi(this->sock.sendcmd("eventwait " + to_string(this->channel)));
 }
 
-unsigned int PRU::mem_readint(int offset)
+int PRU::waitForEvent(int timeout)
 {
-	unsigned int data;
-	unsigned int * pru_addr = NULL;
-	int fd = open("/dev/mem", O_RDWR);
-	pru_addr = (unsigned int*)mmap(NULL, PRU_ICSS_LEN, PROT_READ | PROT_WRITE, MAP_SHARED, fd, PRU_ICSS);
-	if(pru_addr == MAP_FAILED)
-	{
-		cerr << "Failed to map PRU memory" << '\n';
-		exit(EXIT_FAILURE);
-	}
-	data = pru_addr[(this->number)?PRU_DRAM1:PRU_DRAM0];
-
-	close(fd);
-	return data;
+	return stoi(this->sock.sendcmd("eventwait " + to_string(this->channel) + " " + to_string(timeout)));
 }
+
+
