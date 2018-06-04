@@ -151,6 +151,7 @@ class MyRequestHandler(socketserver.StreamRequestHandler):
         elif request[0] == "load0":
             try:
                 p = subprocess.Popen(["cp", "/tmp/pru0", "/lib/firmware/am335x-pru0-fw"])
+                p.wait()
                 reply = 0
             
             except (OSError, IOError) as e:
@@ -159,6 +160,7 @@ class MyRequestHandler(socketserver.StreamRequestHandler):
         elif request[0] == "load1":
             try:
                 p = subprocess.Popen(["cp", "/tmp/pru1", "/lib/firmware/am335x-pru1-fw"])
+                p.wait()
                 reply = 0
             
             except (OSError, IOError) as e:
@@ -196,11 +198,16 @@ class MyRequestHandler(socketserver.StreamRequestHandler):
             try:
                 request[1] = int(request[1])
                 with open('/dev/rpmsg_pru'+ str(request[1])) as fd:
-                    #if first return arg is empty, timeout has occured, send ETIMEDOUT error
-                    if select.select([fd], [], [], int(request[1]))[0]: # wait till fd is ready or timeout
-                        reply = 0
+                    if len(request) == 2 : # no timeout specified, wait indefinitely
+                        select.select([fd], [], []);
+                    elif len(request) == 3:
+                        #if first return arg is empty, timeout has occured, send ETIME error
+                        if select.select([fd], [], [], int(request[1]))[0]: # wait till fd is ready or timeout
+                            reply = 0
+                        else:
+                            reply = errno.ETIME
                     else:
-                        reply = errno.ETIMEDOUT
+                        reply = errno.EINVAL
                 fd.close()
             
             except ValueError as e:
