@@ -6,7 +6,7 @@ import errno
 import select
 import os
 
-class MyRequestHandler(socketserver.StreamRequestHandler):
+class CommandRequestHandler(socketserver.StreamRequestHandler):
     """
     The request handler class for our socket server
     Overrides the handle method of the BaseRequestHandler class to implement communication with the socket file.
@@ -227,7 +227,9 @@ if __name__ == "__main__":
     if os.path.exists(server_address):
         os.unlink(server_address)
     # Create the server, binding to the socket file
-    server =  socketserver.UnixStreamServer(server_address, MyRequestHandler)
+    server =  socketserver.UnixStreamServer(server_address, CommandRequestHandler)
+    # Change socket file permissions
+    os.chmod(server_address, 0o777)
     #Activate the server, serve until terminated
     server.serve_forever()
 
