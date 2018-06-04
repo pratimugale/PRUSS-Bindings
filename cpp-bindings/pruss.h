@@ -2,10 +2,11 @@
 #define PRUSS_H_
 
 #include <stdlib.h>
-#include <string>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <unistd.h>
+#include <string> // string handling
+#include <sys/socket.h> // socket
+#include <sys/un.h> // socket
+#include <unistd.h> // close()
+#include <errno.h> // error codes
 
 //enumeration which describes the states of a PRU Core 
 enum State
@@ -16,10 +17,53 @@ enum State
 	HALTED
 };
 
+//socket class
+class Sock
+{
+	private:
+		const char* socketpath;
+		struct sockaddr_un addr;
+	
+	public:
+		int fd;
+		Sock();
+		bool conn();
+		std::string sendcmd(std::string);
+		void disconn();
+};
+
+class PRU
+{
+	private:
+		int number;
+		int channel;
+		Sock sock;
+		
+	public:
+		State state = NONE;
+		PRU(int);
+		PRU(int, std::string);
+		int enable();
+		int disable();
+		int reset();
+		int pause();
+		int resume();
+		std::string showRegs();
+		int load(std::string);
+		void setChannel();
+		int setChannel(int);
+		State getState();
+		int sendMsg(std::string);
+		std::string getMsg();
+		int waitForEvent();
+		int waitForEvent(int);
+};
+
 class PRUSS
 {
 	private:
-		bool on;
+		bool on = false;
+		Sock sock;
 	
 	public:
 		PRU pru0;
@@ -28,42 +72,13 @@ class PRUSS
 		bool isOn();
 		int bootUp();
 		int shutDown();
+		void restart();
 
 };
 
-class PRU
-{
-	private:
-		State state;
-		int number;
-		std::string channel;
-		PRU(int);
-		PRU(int, std::string);
 
-	public:
-		int enable();
-		int disable();
-		int reset();
-		int pause();
-		int resume();
-		std::string showRegs();
-		int load(std::string);
-		int setChannel(int);
-		State getState();
-		int sendMsg(std::string);
-		std::string getMsg();
-		int waitForEvent();
-};
 
-//socket functions
 
-//connect to the socket and return the socket fd 
-int socket_init();
 
-//send the command to the socket server and return the received message
-std::string socket_send(int, std::string);
-
-//close the socket connection.
-void socket_close(int);
 
 #endif
