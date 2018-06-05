@@ -1,6 +1,6 @@
 # High Level API Specification
 
-![UML Diagram](https://raw.githubusercontent.com/MuneebMohammed/PRUSS-Bindings/master/Documentation/uml_modified.png)
+![UML Diagram](https://raw.githubusercontent.com/MuneebMohammed/PRUSS-Bindings/master/Documentation/uml.png)
  
 ## `class PRUSS`
 The parent class which encapsulates the PRU-ICSS on the Beaglebone. It is a composition of two instances of the `PRU` class.
@@ -12,13 +12,6 @@ Returns a boolean specifying whether the PRUSS is booted or not.
 Enables the Drivers and boots up the System. Returns `0` if successful, else returns the corresponding Error Code.
 ### `int shutDown()`
 Shuts down the PRU-ICSS by disabling the RemoteProc drivers. Returns `0` if successful, else return the corresponding Error Code
-### `int pinMode( int header, int pin, Boolean out)`
-Configures the pinmux settings for the pin specified. Returns `0` if successful, else returns the corresponding Error Code.
-
-**Parameters**
-* `header` - 8/9
-* `pin` - The pin on the header
-* `out` - Whether the pin should be pruout or pruin
 ### `int writeSharedMem(int data, int offset)`
 Writes 4 bytes of data to the PRU Shared Memory (12 KB) with the given address offset. Returns `0` if successful, else returns the corresponding Error Code.
 
@@ -107,6 +100,20 @@ Read 4 bytes of data from the respective Data Memory at the address `offset`. Re
 
 **Parameters**
 * `offset` - the address offset from which the data is to be read.
+
+## `class Socket`
+The class which encapsulates the Client socket functions for Unix Domain Sockets. The instances of this class are used by the `PRUSS`  and the `PRU` classes to send commands to the Socket Server to request for PRU Resources.
+### `Socket()`
+Constructor. Creates an instance of the Socket Class. Initialises the `socketpath` to `/tmp/prusocket` which is the default socket file for PRU requests.
+### `Boolean conn()`
+Opens a socket connection. Returns `true` if successful and `false` otherwise.
+### `Boolean disconn()`
+Disconnects from the socket connection. Returns `true` if successful and `false` otherwise.
+### `String sendCommand(String command)`
+Sends a command to the server over the socket connection. Returns the reply send by the server over the socket connection.
+
+**Parameters**
+* `command` - the command to be sent to the socket server
 
 ## `enum State`
 An Enumeration which describes the state of the PRU Core.
