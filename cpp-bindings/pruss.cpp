@@ -2,13 +2,13 @@
 
 using namespace std;
 
-Sock::Sock()
+Socket::Socket()
 {
 	this->fd = -1;
 	this->socketpath = "/tmp/prusocket";
 }
 
-bool Sock::conn()
+bool Socket::conn()
 {
 	
 	// get a socket to work with. The socket will be a unix domain stream socket
@@ -26,7 +26,7 @@ bool Sock::conn()
 	return true;
 }
 
-string Sock::sendcmd(string command)
+string Socket::sendcmd(string command)
 {
 	if(!this->conn()) // Connect to the socket 
 		return to_string(ECONNREFUSED);
@@ -47,10 +47,13 @@ string Sock::sendcmd(string command)
 	return received;
 }
 
-void Sock::disconn()
+bool Socket::disconn()
 {
+	if(this->fd == -1)
+		return false;
 	close(this->fd);
 	this->fd = -1;
+	return true;
 }
 
 PRUSS::PRUSS() : pru0(0), pru1(1)
@@ -68,8 +71,8 @@ bool PRUSS::isOn()
 int PRUSS::bootUp()
 {
 	if(this->on)
-		return EALREADY;
-	int ret = stoi(this->sock.sendcmd("probe_rproc")); //send command
+		return -EALREADY;
+	int ret = -stoi(this->sock.sendcmd("probe_rproc")); //send command
 	if(!ret) {
 		this->on = true;
 		this->pru0.state = this->pru1.state = STOPPED; //PRU Cores are disabled after bootup
@@ -80,10 +83,12 @@ int PRUSS::bootUp()
 int PRUSS::shutDown()
 {
 	if(!this->on)
-		return EALREADY;
-	int ret = stoi(this->sock.sendcmd("unprobe_rproc"));
+		return -EALREADY;
+	int ret = -stoi(this->sock.sendcmd("unprobe_rproc"));
 	if(!ret) {
 		this->on = false;
+		this->pru0.disable();
+		this->pru1.disable();
 		this->pru0.state = this->pru1.state = NONE;
 	}
 	return ret;
@@ -112,10 +117,10 @@ PRU::PRU(int number, string fw)
 int PRU::enable()
 {
 	if(this->state == NONE)
-		return ENODEV;
+		return -ENODEV;
 	if(this->state == RUNNING || this->state == HALTED)
-		return EALREADY;
-	int ret = stoi(this->sock.sendcmd("enable"+to_string(this->number)));
+		return -EALREADY;
+	int ret = -stoi(this->sock.sendcmd("enable"+to_string(this->number)));
 	if(!ret)
 		this->state = RUNNING;
 	return ret;
@@ -124,10 +129,10 @@ int PRU::enable()
 int PRU::disable()
 {
 	if(this->state == NONE)
-		return ENODEV;
+		return -ENODEV;
 	if(this->state == STOPPED)
-		return EALREADY;
-	int ret = stoi(this->sock.sendcmd("disable"+to_string(this->number)));
+		return -EALREADY;
+	int ret = -stoi(this->sock.sendcmd("disable"+to_string(this->number)));
 	if(!ret)
 		this->state = STOPPED;
 	return ret;
@@ -142,10 +147,10 @@ int PRU::reset()
 int PRU::pause()
 {
 	if(this->state == NONE)
-		return ENODEV;
+		return -ENODEV;
 	if(this->state == HALTED)
-		return EALREADY;
-	int ret = stoi(this->sock.sendcmd("pause"+to_string(this->number)));
+		return -EALREADY;
+	int ret = -stoi(this->sock.sendcmd("pause"+to_string(this->number)));
 	if(!ret)
 		this->state = HALTED;
 	return ret;
@@ -154,10 +159,10 @@ int PRU::pause()
 int PRU::resume()
 {
 	if(this->state == NONE || this->state == STOPPED)
-		return ENODEV;
+		return -ENODEV;
 	if(this->state == RUNNING)
-		return EALREADY;
-	int ret = stoi(this->sock.sendcmd("resume"+to_string(this->number)));
+		return -EALREADY;
+	int ret = -stoi(this->sock.sendcmd("resume"+to_string(this->number)));
 	if(!ret)
 		this->state = RUNNING;
 	return ret;
@@ -172,9 +177,9 @@ int PRU::load(string fw)
 {
 	this->disable();
 	if(system(("cp "+ fw + " /tmp/pru" + to_string(this->number)).c_str())) {
-		return ENOENT;	
+		return -ENOENT;	
 	}
-	int ret = stoi(this->sock.sendcmd("load" + to_string(this->number)));
+	int ret = -stoi(this->sock.sendcmd("load" + to_string(this->number)));
 	this->enable();
 	return ret;
 }
@@ -187,7 +192,7 @@ void PRU::setChannel()
 int PRU::setChannel(int channel)
 {
 	if(channel < 0)
-		return EINVAL;
+		return -EINVAL;
 	this->channel = channel;
 	return 0;
 }
@@ -199,7 +204,7 @@ State PRU::getState()
 
 int PRU::sendMsg(string message)
 {
-	return stoi(this->sock.sendcmd("sendmsg " + to_string(this->channel) + " " + message)); // eg. sendmsg 31 hi!
+	return -stoi(this->sock.sendcmd("sendmsg " + to_string(this->channel) + " " + message)); // eg. sendmsg 31 hi!
 }
 
 string PRU::getMsg()
@@ -209,12 +214,12 @@ string PRU::getMsg()
 
 int PRU::waitForEvent()
 {
-	return stoi(this->sock.sendcmd("eventwait " + to_string(this->channel)));
+	return -stoi(this->sock.sendcmd("eventwait " + to_string(this->channel)));
 }
 
 int PRU::waitForEvent(int timeout)
 {
-	return stoi(this->sock.sendcmd("eventwait " + to_string(this->channel) + " " + to_string(timeout)));
+	return -stoi(this->sock.sendcmd("eventwait " + to_string(this->channel) + " " + to_string(timeout)));
 }
 
 

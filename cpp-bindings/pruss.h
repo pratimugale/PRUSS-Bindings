@@ -18,18 +18,18 @@ enum State
 };
 
 //socket class
-class Sock
+class Socket
 {
 	private:
 		const char* socketpath;
 		struct sockaddr_un addr;
+		int fd;
 	
 	public:
-		int fd;
-		Sock();
+		Socket();
 		bool conn();
+		bool disconn();
 		std::string sendcmd(std::string);
-		void disconn();
 };
 
 class PRU
@@ -37,10 +37,9 @@ class PRU
 	private:
 		int number;
 		int channel;
-		Sock sock;
-		
-	public:
+		Socket sock;
 		State state = NONE;
+	public:
 		PRU(int);
 		PRU(int, std::string);
 		int enable();
@@ -63,8 +62,7 @@ class PRUSS
 {
 	private:
 		bool on = false;
-		Sock sock;
-	
+		Socket sock;
 	public:
 		PRU pru0;
 		PRU pru1;
@@ -75,10 +73,5 @@ class PRUSS
 		void restart();
 
 };
-
-
-
-
-
 
 #endif
