@@ -170,7 +170,7 @@ class CommandRequestHandler(socketserver.StreamRequestHandler):
             try:
                 request[1] = int(request[1]) #channel number, throws ValueError if not int
                 with open('/dev/rpmsg_pru'+str(request[1]), 'w') as fd:
-                    fd.write(request[2]+"\n")
+                    fd.write((' '.join(request[2:]))+"\n")
                 fd.close()
                 reply = 0
             
@@ -202,7 +202,7 @@ class CommandRequestHandler(socketserver.StreamRequestHandler):
                         select.select([fd], [], []);
                     elif len(request) == 3:
                         #if first return arg is empty, timeout has occured, send ETIME error
-                        if select.select([fd], [], [], int(request[1]))[0]: # wait till fd is ready or timeout
+                        if select.select([fd], [], [], int(request[2]))[0]: # wait till fd is ready or timeout
                             reply = 0
                         else:
                             reply = errno.ETIME

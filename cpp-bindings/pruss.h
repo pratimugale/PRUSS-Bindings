@@ -38,8 +38,8 @@ class PRU
 		int number;
 		int channel;
 		Socket sock;
-		State state = NONE;
 	public:
+		State state = NONE;	
 		PRU(int);
 		PRU(int, std::string);
 		int enable();
