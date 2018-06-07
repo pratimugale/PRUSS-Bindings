@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 
 import socketserver
+import threading
 import subprocess
 import errno
 import select
 import os
 
-class CommandRequestHandler(socketserver.StreamRequestHandler):
+class PRURequestHandler(socketserver.StreamRequestHandler):
     """
     The request handler class for our socket server
     Overrides the handle method of the BaseRequestHandler class to implement communication with the socket file.
@@ -220,6 +221,10 @@ class CommandRequestHandler(socketserver.StreamRequestHandler):
 
         self.wfile.write(bytes(str(reply)+"\n", "utf-8"))
 
+class ThreadedPRUServer(socketserver.ThreadingMixIn, socketserver.UnixStreamServer):
+    pass
+
+
 if __name__ == "__main__":
     server_address = '/tmp/prusocket'
     
@@ -227,9 +232,9 @@ if __name__ == "__main__":
     if os.path.exists(server_address):
         os.unlink(server_address)
     # Create the server, binding to the socket file
-    server =  socketserver.UnixStreamServer(server_address, CommandRequestHandler)
+    server =  ThreadedPRUServer(server_address, PRURequestHandler)
+    server_thread = threading.Thread(target=server.serve_forever)
+    server_thread.start()
     # Change socket file permissions
     os.chmod(server_address, 0o777)
-    #Activate the server, serve until terminated
-    server.serve_forever()
 
