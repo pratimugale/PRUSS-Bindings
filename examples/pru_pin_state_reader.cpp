@@ -7,7 +7,8 @@ int main()
 {
 	PRUSS p;
 	PRU p1 = p.pru1;
-	p1.load("./firmware_examples/pru_pin_state_reader/gen/pru_pin_state_reader.out");
+	if(p1.load("./firmware_examples/pru_pin_state_reader/gen/pru_pin_state_reader.out"))
+		return 0;
 	p1.sendMsg("S");
 	int timeout, ret;
 	cout << "Enter timeout(in seconds)(-1 for indefinite): ";

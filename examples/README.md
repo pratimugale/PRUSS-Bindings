@@ -16,7 +16,7 @@ If all goes well, you should see the daemon service active and enabled.
 
 
 ## Compiling and Running the firmware and the example apps using the bindings
-* To run the specfic example - blinky, rpmsg_echo or pru_pin_state_reader
+* To run the specfic example - blinky, rpmsg_echo, pru_pin_state_reader, pru1_to_pru0_to_arm, multi_threaded
 ```
 bash run.sh blinky
 ./blinky.o
@@ -28,4 +28,12 @@ bash run.sh rpmsg_echo
 ```
 bash run.sh pru_pin_state_reader
 ./pru_pin_state_reader.o
+```
+```
+bash run.sh pru1_to_pru0_to_arm
+./pru1_to_pru0_to_arm.o
+```
+```
+bash run.sh multi_threaded
+./multi_threaded.o
 ```

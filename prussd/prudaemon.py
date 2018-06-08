@@ -41,14 +41,14 @@ class PRURequestHandler(socketserver.StreamRequestHandler):
         elif request[0] == "unprobe_rproc":
             try:
                 p = subprocess.Popen(["/sbin/modprobe", "-r", "pru_rproc"])
-            
+                p.wait();
             except OSError as e:
                 reply = e.errno
                 
         elif request[0] == "unprobe_rpmsg":
             try:
                 p = subprocess.Popen(["/sbin/modprobe", "-r", "pru_rpmsg"])
-            
+                p.wait();
             except OSError as e:
                 reply = e.errno
 
@@ -109,27 +109,27 @@ class PRURequestHandler(socketserver.StreamRequestHandler):
         elif request[0] == "pause0":
             try:
                 p = subprocess.Popen(["/bin/sh", "-c", "echo 1 > /sys/kernel/debug/remoteproc/remoteproc1/single_step"])
-                
+                p.wait();
             except OSError as e:
                 reply = e.errno
         
         elif request[0] == "pause1":
             try:
                 p = subprocess.Popen(["/bin/sh", "-c", "echo 1 > /sys/kernel/debug/remoteproc/remoteproc2/single_step"])
-                
+                p.wait();
             except OSError as e:
                 reply = e.errno
         elif request[0] == "resume0":
             try:
                 p = subprocess.Popen(["/bin/sh", "-c", "echo 0 > /sys/kernel/debug/remoteproc/remoteproc1/single_step"])
-                
+                p.wait();
             except OSError as e:
                 reply = e.errno
         
         elif request[0] == "resume1":
             try:
                 p = subprocess.Popen(["/bin/sh", "-c", "echo 0 > /sys/kernel/debug/remoteproc/remoteproc2/single_step"])
-                
+                p.wait();
             except OSError as e:
                 reply = e.errno
 
