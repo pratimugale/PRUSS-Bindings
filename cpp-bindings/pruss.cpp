@@ -59,6 +59,9 @@ bool Socket::disconn()
 PRUSS::PRUSS() : pru0(0), pru1(1)
 {
 	// boot up the PRUSS by probing the remoteproc driver
+	this->sock.sendcmd("disable0");
+	this->sock.sendcmd("disable1");
+
 	this->bootUp();
 	
 }

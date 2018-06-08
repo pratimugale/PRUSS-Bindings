@@ -24,6 +24,7 @@ class PRURequestHandler(socketserver.StreamRequestHandler):
         if request[0] == "probe_rproc":
             try:
                 p = subprocess.Popen(["/sbin/modprobe", "pru_rproc"])
+                p.wait()
             
             except OSError as e:
                 reply = e.errno
@@ -31,6 +32,7 @@ class PRURequestHandler(socketserver.StreamRequestHandler):
         elif request[0] == "probe_rpmsg":
             try:
                 p = subprocess.Popen(["/sbin/modprobe", "pru_rpmsg"])
+                p.wait()
             
             except OSError as e:
                 reply = e.errno
@@ -219,7 +221,7 @@ class PRURequestHandler(socketserver.StreamRequestHandler):
         else:
             reply = "Command not found\n"
 
-        self.wfile.write(bytes(str(reply)+"\n", "utf-8"))
+        self.wfile.write(bytes(str(reply), "utf-8"))
 
 class ThreadedPRUServer(socketserver.ThreadingMixIn, socketserver.UnixStreamServer):
     pass
