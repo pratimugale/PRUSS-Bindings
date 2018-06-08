@@ -24,12 +24,12 @@ class Socket
 		const char* socketpath;
 		struct sockaddr_un addr;
 		int fd;
-	
-	public:
 		Socket();
 		bool conn();
 		bool disconn();
 		std::string sendcmd(std::string);
+		friend class PRUSS; //Only these classes have access to the Socket class
+		friend class PRU; //Only these classes have access to the Socket class
 };
 
 class PRU
@@ -38,10 +38,11 @@ class PRU
 		int number;
 		int channel;
 		Socket sock;
-	public:
 		State state = NONE;	
 		PRU(int);
 		PRU(int, std::string);
+		friend class PRUSS; //Only PRUSS class can call the PRU class constructors
+	public:
 		int enable();
 		int disable();
 		int reset();
@@ -64,9 +65,9 @@ class PRUSS
 		bool on = false;
 		Socket sock;
 	public:
+		PRUSS();
 		PRU pru0;
 		PRU pru1;
-		PRUSS();
 		bool isOn();
 		int bootUp();
 		int shutDown();
