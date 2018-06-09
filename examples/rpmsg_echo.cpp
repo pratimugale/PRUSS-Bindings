@@ -5,7 +5,7 @@ using namespace std;
 
 int main()
 {
-	PRUSS p;
+	PRUSS& p = PRUSS::get();
 	PRU p0 = p.pru0;
 	p0.enable();
 	if(!p0.load("./firmware_examples/rpmsg_echo/gen/rpmsg_echo.out"))

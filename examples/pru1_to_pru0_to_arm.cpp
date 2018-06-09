@@ -7,7 +7,7 @@ using namespace std;
 int main()
 {
 	struct timeval before, after;
-	PRUSS p;
+	PRUSS& p = PRUSS::get();
 	PRU p0 = p.pru0;
 	PRU p1 = p.pru1;
 	p0.load("./firmware_examples/pru1_to_pru0_to_arm/gen/main_pru0_fw.out");

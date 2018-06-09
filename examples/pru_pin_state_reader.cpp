@@ -5,7 +5,7 @@ using namespace std;
 
 int main()
 {
-	PRUSS p;
+	PRUSS& p = PRUSS::get();
 	PRU p1 = p.pru1;
 	if(p1.load("./firmware_examples/pru_pin_state_reader/gen/pru_pin_state_reader.out"))
 		return 0;

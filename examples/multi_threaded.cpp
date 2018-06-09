@@ -8,7 +8,7 @@ using namespace std;
 int main()
 {
 	int status = 0, in;
-	PRUSS p;
+	PRUSS& p = PRUSS::get();
 	PRU p1 = p.pru1;
 	PRU p0 = p.pru0;
 	p1.load("./firmware_examples/multi_threaded/gen/main_pru1_fw.out");

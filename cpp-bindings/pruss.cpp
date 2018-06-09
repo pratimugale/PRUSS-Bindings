@@ -56,6 +56,12 @@ bool Socket::disconn()
 	return true;
 }
 
+PRUSS& PRUSS::get()
+{
+	static PRUSS p;
+	return p;
+}
+
 PRUSS::PRUSS() : pru0(0), pru1(1)
 {
 	// boot up the PRUSS by probing the remoteproc driver
@@ -64,6 +70,12 @@ PRUSS::PRUSS() : pru0(0), pru1(1)
 
 	this->bootUp();
 	
+}
+
+PRUSS::~PRUSS()
+{
+	if(this->isOn())
+		this->shutDown();
 }
 
 bool PRUSS::isOn()
@@ -87,11 +99,11 @@ int PRUSS::shutDown()
 {
 	if(!this->on)
 		return -EALREADY;
+	this->pru0.disable();
+	this->pru1.disable();
 	int ret = -stoi(this->sock.sendcmd("unprobe_rproc"));
 	if(!ret) {
 		this->on = false;
-		this->pru0.disable();
-		this->pru1.disable();
 		this->pru0.state = this->pru1.state = NONE;
 	}
 	return ret;

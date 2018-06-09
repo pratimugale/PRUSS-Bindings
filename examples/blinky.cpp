@@ -5,7 +5,7 @@ using namespace std;
 
 int main()
 {
-	PRUSS p;
+	PRUSS& p = PRUSS::get();
 	PRU p1 = p.pru1;
 	p1.load("./firmware_examples/blinky/gen/blinky.out"); 
 	cout << "Blinky loaded on PRU1(press p to pause, r to resume, d to disable, e to enable, q to quit)" << endl;

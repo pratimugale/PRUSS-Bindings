@@ -64,8 +64,10 @@ class PRUSS
 	private:
 		bool on = false;
 		Socket sock;
-	public:
 		PRUSS();
+		~PRUSS();
+	public:
+		static PRUSS& get();
 		PRU pru0;
 		PRU pru1;
 		bool isOn();
