@@ -1,10 +1,12 @@
 [Unit]
-Description = Service for PRU Access
+Description=Daemon Service to serve PRU access requests for non-root processes
+ConditionPathExists=|DIR
 
 [Service]
-Type=simple
-ExecStart=/usr/bin/python3 /home/debian/PRUSS-Bindings/prussd/prudaemon.py
-ExecStopPost=/bin/sh -c 'rm /tmp/prusocket'
+WorkingDirectory=DIR/prussd
+ExecStart=DIR/prussd/prussd.py
+ExecStopPost=/bin/sh -c 'rm /tmp/prussd.sock'
+Restart=on-failure
 StandardOutput=null
 
 [Install]
