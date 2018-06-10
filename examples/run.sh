@@ -1,14 +1,15 @@
 #! /bin/bash
 
+DIR=$(cd `dirname $BASH_SOURCE[0]` && pwd -P)
+
 echo "This must be run on the BeagleBone Black itself"
 echo "Tested on kernel 4.9.36-ti-r46. Firmware Code taken from the BeagleScope project"
 echo "https://github.com/ZeekHuge/BeagleScope/tree/port_to_4.4.12-ti-r31%2B/examples/firmware_exmples"
-echo "Press any key to continue"
-read
+
 
 
 echo "-Building Firmware"
-	cd ./firmware_examples/$1/
+	cd "${DIR}/firmware_examples/$1/"
 	make clean
 	make
 

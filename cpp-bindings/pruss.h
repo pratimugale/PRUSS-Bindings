@@ -2,6 +2,7 @@
 #define PRUSS_H_
 
 #include <stdlib.h>
+#include <linux/limits.h> // realpath
 #include <string> // string handling
 #include <sys/socket.h> // socket
 #include <sys/un.h> // socket
@@ -36,7 +37,8 @@ class PRU
 {
 	private:
 		int number;
-		int channel;
+		int chanPort;
+		std::string chanName;
 		Socket sock;
 		State state = NONE;	
 		PRU(int);
@@ -51,7 +53,7 @@ class PRU
 		std::string showRegs();
 		int load(std::string);
 		void setChannel();
-		int setChannel(int);
+		int setChannel(int, std::string);
 		State getState();
 		int sendMsg(std::string);
 		std::string getMsg();

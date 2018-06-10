@@ -68,7 +68,7 @@ def sysfs_write(path, val):
 
 def set_config():
     """Reads the Daemon config file and sets paths accordingly."""
-    if os.path.exists(paths.CONFIG_FILE):
+    if not os.path.exists(paths.CONFIG_FILE):
         return
     try:
         with open(paths.CONFIG_FILE, "r") as fd:
@@ -111,7 +111,7 @@ def load_firmware(number, cmd):
 
     try:
         fname = cmd[1].split("/")[-1]
-        fw_path = paths.FIRMWARE_PATH+fname
+        fw_path = paths.FIRMWARE_PATH+"/"+fname
         if cmd[1] != fw_path:
             shutil.copyfile(os.path.normpath(cmd[1]), os.path.normpath(fw_path))
         return sysfs_write(rproc_sysfs("firmware", number), fname)
@@ -161,7 +161,7 @@ def send_msg(cmd):
     if not os.path.exists(rpmsg_dev):
         return -errno.ENODEV
     try:
-        with open(rpmsg_dev, 'r') as fd:
+        with open(rpmsg_dev, 'w') as fd:
             fd.write(' '.join(cmd[3:])+'\n')
             return 0
     except OSError as err:
@@ -191,7 +191,7 @@ def event_wait(cmd):
                 select.select([fd], [], [])
                 return 0
             else:
-                return 0 if select.select([fd], [], [], timeout) else -errno.ETIME
+                return 0 if select.select([fd], [], [], timeout)[0] else -errno.ETIME
     except OSError as err:
         return -err.errno
 
@@ -208,7 +208,7 @@ class PRURequestHandler(socketserver.StreamRequestHandler):
         self.data = self.rfile.readline().strip()
 
         #decode bytes into string and get command args
-        cmd = self.data.decode("utf-8").upper().split()
+        cmd = self.data.decode("utf-8").split()
 
         #dict mapping commands to functions
         cmds = {

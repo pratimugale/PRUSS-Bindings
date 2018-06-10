@@ -24,9 +24,8 @@ int main()
 		gettimeofday(&after, NULL);
 		cout << ((after.tv_sec - before.tv_sec)*1000000L + after.tv_sec) - before.tv_sec << "\n";
 	}
-	p0.disable();
 	p1.disable();
-	p.shutDown();
-	
+	p0.disable();
+
 
 }
