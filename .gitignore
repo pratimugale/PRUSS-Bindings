@@ -20,6 +20,10 @@ gen/
 # Perl module
 *.pm
 
+# Node modules and packages
+bower_components/
+node_modules/
+
 # Distribution / Packaging
 .Python
 build/
