@@ -14,15 +14,10 @@ var prussrouter = express.Router();
 
 app.use(parser.json({ type: 'application/json' }));
 app.use(parser.urlencoded({ extended: true }));
+app.use(express.static('app'))
 
 var states = ["NONE", "STOPPED", "RUNNING", "HALTED"];
 
-router.get('/', function(req, res){
-	res.json({ 
-		"state0": states[pru[0].getState()],
-		"state1": states[pru[1].getState()]
-	});
-});
 
 router.get('/:no([0-1])', function(req, res){
 	res.json({ "status": states[pru[req.params.no].getState()] });	
@@ -53,6 +48,29 @@ router.get('/:no([0-1])/message', function(req, res){
 	res.json({ "message": pru[req.params.no].getMsg() });
 });
 
+
+router.get('/:no([0-1])/event/:time([0-9])?', function(req, res){
+	
+	function eventwait(number, tout, cb){
+		var retr = pru[number].waitForEvent(tout)
+		console.log("wait over")
+		cb(retr)
+	}
+	function async_eventwait(no, timeout){
+		return new Promise(function(resolve){
+			eventwait(no, timeout, function(data){
+				resolve(data)
+			})
+		})
+	}
+
+	var timeout = (req.params.time==undefined)?-1:req.params.time;
+	async_eventwait(req.params.no, parseInt(timeout)).then(function(data){
+		res.json({ "return": data })
+	})
+	console.log("exited");
+});
+
 router.post('/:no([0-1])/message', function(req, res){
 	var msg = req.body.message;
 	res.json({ "return": pru[req.params.no].sendMsg(msg) });
@@ -74,7 +92,7 @@ prussrouter.get('/off', function(req, res){
 });
 
 app.use('/pru', router);
-app.use('/', prussrouter);
+app.use('/pruss', prussrouter);
 app.listen(port);
 console.log('server started at port:8888');
 

@@ -1,93 +1,289 @@
+
+
 <!DOCTYPE html>
 <html>
-<head>
-  <title>PRU Demo App</title>
-  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
-  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css">
-</head>
-  <nav class="navbar navbar-default" style="margin:0;">
-    <div class="container-fluid">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="#">PRU Demo App</a>
-      </div>
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        <ul class="nav navbar-nav">
-          <li><a href="#">App to interact with the PRUs</a></li>
-        </ul>
-      </div>
-    </div>
-  </nav>
+   <head>
+      <title>PRU Demo App</title>
+      <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+      <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css">
+      <script src="bower_components/jquery/dist/jquery.min.js"></script>
+      <script>
+         function setButtons(state) {
+         	if (state == "RUNNING") {
+         		$('#blinky_enable').attr("disabled", true);
+         		$('#blinky_disable').attr("disabled", false);
+         		$('#blinky_pause').attr("disabled", false);
+         		$('#blinky_resume').attr("disabled", true);
+         	} else if (state == "STOPPED") {
+         		$('#blinky_enable').attr("disabled", false);
+         		$('#blinky_disable').attr("disabled", true);
+         		$('#blinky_pause').attr("disabled", true);
+         		$('#blinky_resume').attr("disabled", true);
+         	} else if (state == "HALTED") {
+         		$('#blinky_enable').attr("disabled", true);
+         		$('#blinky_disable').attr("disabled", false);
+         		$('#blinky_pause').attr("disabled", true);
+         		$('#blinky_resume').attr("disabled", false);
+         	} else{
+         		$('#blinky_enable').attr("disabled", false);
+         		$('#blinky_disable').attr("disabled", false);
+         		$('#blinky_pause').attr("disabled", false);
+         		$('#blinky_resume').attr("disabled", false);
+         	}
+         }
+         
+         function showState(no, element) {
+         	$.ajax({type: "GET",
+                   url: '/pru/'+no,
+                    dataType: 'json',
+                    success:function(result){
+                    	element.val(result.status);
+                    	if(no) setButtons(result.status);
+                    },
+                    error:function(result)
+                    {
+                      console.log(result);
+                      }
+                    });
+         }
+         
+         function sendAjaxGetRequest(element,urlToSend) {
+                    var clickedButton = element;
+                     $.ajax({type: "GET",
+                         url: urlToSend,
+                         dataType: 'json',
+                         success:function(result){
+                         	showState(1,$('#blinky_status'));
+                         	$('#blinky_return').val(result.return);
+                         },
+                        error:function(result)
+                         {
+                         console.log("error");
+                        }
+                    });
+            }
+         	$(document).ready(function(){
+         
+         
+         	$("#blinky_load").click(function(e){
+                     e.preventDefault();
+                     $.ajax({type: "POST",
+                         url: "/pru/1/load",
+                         dataType: 'json',
+                         data: {"file":"/home/debian/PRUSS-Bindings/examples/firmware_examples/blinky/gen/blinky.out"},
+                         success:function(result){
+                         	if(1){
+                         		console.log(result);
+                         		showState(1, $('#blinky_status'));
+                         		$('#blinky_return').val(result.return);
+                         		alert("blinky loaded on P8.46. Click buttons to control");
+                         	}
+                   
+                         	else
+                         		alert("Error loading blinky.");
+                         },
+                        error:function(result)
+                         {
+                         alert("error");
+                        }
+                    });
+         
+                 });
+                 $("#blinky_enable").click(function(e){
+                 		console.log("clicked");
+                     e.preventDefault();
+                     sendAjaxGetRequest($(this),'/pru/1/start');
+         
+                 });
+                 $("#blinky_disable").click(function(e){
+                 		console.log("clicked");
+                     e.preventDefault();
+                     ret = sendAjaxGetRequest($(this),'/pru/1/stop');
+                 });
+                 $("#blinky_pause").click(function(e){
+                 		console.log("clicked");
+                     e.preventDefault();
+                     ret = sendAjaxGetRequest($(this),'/pru/1/pause');
+         
+                 });
+                 $("#blinky_resume").click(function(e){
+                 		console.log("clicked");
+                     e.preventDefault();
+                     ret = sendAjaxGetRequest($(this),'/pru/1/resume');
+         
+                 });
+         
+                 $("#rpmsg_load").click(function(e){
+                     e.preventDefault();
+                     $.ajax({type: "POST",
+                         url: "/pru/0/load",
+                         dataType: 'json',
+                         data: {"file":"/home/debian/PRUSS-Bindings/examples/firmware_examples/rpmsg_echo/gen/rpmsg_echo.out"},
+                         success:function(result){
+                         	if(result.return == 0){
+                         		showState(0, $('#rpmsg_status'));
+                         		alert("Echo loaded. Enter message and send. Press get to get back the message");
+                         	}
+                   
+                         	else
+                         		alert("Error loading blinky.");
+                         },
+                        error:function(result)
+                         {
+                         alert("error");
+                        }
+                    });
+                 });
 
-<div class="container">
-  <h2 align="center">Demo Examples</h2>
-  <br>
-  <div class="row">
-    <div class="panel panel-primary">
-      <div class="panel-heading">
-        <h3 class="panel-title">Blinky</h3>
+                 $("#rpmsg_send").click(function(e){
+                     e.preventDefault();
+                     $.ajax({type: "POST",
+                         url: "/pru/0/message",
+                         dataType: 'json',
+                         data: { "message":$('#rpmsg_message').val() },
+                         success:function(result){
+                          if(result.return == 0){
+                            alert("Message sent successfully");
+                          }
+                   
+                          else
+                            alert("Error sending message");
+                         },
+                        error:function(result)
+                         {
+                         alert("error");
+                        }
+                    });
+                 });
+                 $("#rpmsg_get").click(function(e){
+                     e.preventDefault();
+                     $.ajax({type: "GET",
+                         url: "/pru/0/message",
+                         dataType: 'json',
+                         success:function(result){
+                              if (result.message == "") {
+                                alert('No message from the PRU');
+                              }
+                             $('#rpmsg_return').val(result.message);
+                         },
+                        error:function(result)
+                         {
+                         alert("error");
+                        }
+                    });
+                 });
+            
+               });
+      </script>
+   </head>
+   <nav class="navbar navbar-default" style="margin:0;">
+      <div class="container-fluid">
+         <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">PRU Demo App</a>
+         </div>
+         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+               <li><a href="#">App to interact with the PRUs</a></li>
+            </ul>
+         </div>
       </div>
-      <div class="panel-body">
-        <h3>Sets up a blinky on pin 8.46</h3>
-        <div class="panel panel-default">
-          <div class="panel-body">
-            Basic panel example
-          </div>
-        </div>
+   </nav>
+   <div class="container">
+      <h2 align="center">Demo Examples</h2>
+      <br>
+      <div class="row">
+         <div class="panel panel-primary">
+            <div class="panel-heading">
+               <h3 class="panel-title">Blinky</h3>
+            </div>
+            <div class="panel-body">
+               <h3>Sets up a blinky on pin 8.46</h3>
+               <button id="blinky_load" value="val_1" name="but1">LOAD</button>
+               <br><br>
+               <div class="panel panel-default">
+                  <div class="panel-body blinky">
+                     <button id="blinky_enable" value="start">Enable</button>
+                     <button id="blinky_disable" value="stop">Disable</button>
+                     <button id="blinky_pause" value="pause">Pause</button>
+                     <button id="blinky_resume" value="resume">Resume</button>
+                     <br>
+                     <br>
+                     <span style="display: block; width: YOURWIDTH;">
+                     <label>State:</label>&nbsp<input type="text" value="" readonly="true" id="blinky_status"> 
+                     </span>
+                     <br>
+                     <span>
+                     <label>Return Code:</label>&nbsp<input type="text" readonly="true" id="blinky_return">
+                     </span>
+                  </div>
+               </div>
+            </div>
+         </div>
       </div>
-    </div>
-  </div>
-  <br>
-  <div class="row">
-    <div class="panel panel-primary">
-      <div class="panel-heading">
-        <h3 class="panel-title">RPMsg Loopback</h3>
+      <br>
+      <div class="row">
+         <div class="panel panel-primary">
+            <div class="panel-heading">
+               <h3 class="panel-title">RPMsg Loopback</h3>
+            </div>
+            <div class="panel-body">
+               <h3>The PRU echoes back the message sent using RPMsg</h3>
+               <button id="rpmsg_load" value="val_1" name="but1">LOAD</button>
+               <br><br>
+               <div class="panel panel-default">
+                  <div class="panel-body">
+                     <span style="display: block; width: YOURWIDTH;">
+                     <label>State:</label>&nbsp<input type="text" value="" readonly="true" id="rpmsg_status">
+                     <br> <br>
+                     <span>
+                     <label>Enter message:</label>&nbsp<input type="text" value="" id="rpmsg_message">
+                     </span>
+                     <button id="rpmsg_send">SEND</button>
+                     <br><br>
+                     <span>
+                     <label>Returned Message:</label>&nbsp<input type="text" readonly="true" id="rpmsg_return">
+                     </span>
+                     <button id="rpmsg_get">GET</button>
+                  </div>
+               </div>
+            </div>
+         </div>
       </div>
-      <div class="panel-body">
-        <h3>The PRU echoes back the message sent using RPMsg</h3>
-        <div class="panel panel-default">
-          <div class="panel-body">
-            Basic panel example
-          </div>
-        </div>
+      <div class="row">
+         <div class="panel panel-primary">
+            <div class="panel-heading">
+               <h3 class="panel-title">Pin State Reader</h3>
+            </div>
+            <div class="panel-body">
+               <h3>Waits for a state change on a pin and sends a message when it occurs</h3>
+               <div class="panel panel-default">
+                  <div class="panel-body">
+                     Basic panel example
+                  </div>
+               </div>
+            </div>
+         </div>
       </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="panel panel-primary">
-      <div class="panel-heading">
-        <h3 class="panel-title">Pin State Reader</h3>
+      <div class="row">
+         <div class="panel panel-primary">
+            <div class="panel-heading">
+               <h3 class="panel-title">Inter-PRU Communication</h3>
+            </div>
+            <div class="panel-body">
+               <h3>Waits for a state change on a pin and sends a message when it occurs</h3>
+               <div class="panel panel-default">
+                  <div class="panel-body">
+                     Basic panel example
+                  </div>
+               </div>
+            </div>
+         </div>
       </div>
-      <div class="panel-body">
-        <h3>Waits for a state change on a pin and sends a message when it occurs</h3>
-        <div class="panel panel-default">
-          <div class="panel-body">
-            Basic panel example
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="panel panel-primary">
-      <div class="panel-heading">
-        <h3 class="panel-title">Inter-PRU Communication</h3>
-      </div>
-      <div class="panel-body">
-        <h3>Waits for a state change on a pin and sends a message when it occurs</h3>
-        <div class="panel panel-default">
-          <div class="panel-body">
-            Basic panel example
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+   </div>
 
-  
