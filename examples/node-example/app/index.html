@@ -126,7 +126,7 @@
                          	}
                    
                          	else
-                         		alert("Error loading blinky.");
+                         		alert("Error loading firmware.");
                          },
                         error:function(result)
                          {
@@ -172,8 +172,95 @@
                         }
                     });
                  });
+
+                 $("#pinstate_load").click(function(e){
+                     e.preventDefault();
+                     $.ajax({type: "POST",
+                         url: "/pru/1/load",
+                         dataType: 'json',
+                         data: {"file":"/home/debian/PRUSS-Bindings/examples/firmware_examples/pru_pin_state_reader/gen/pru_pin_state_reader.out"},
+                         success:function(result){
+                          if(result.return == 0){
+                            $('#pinstate_status').val('NOT STARTED')
+                            $('#pinstate_start').attr('disabled', false);
+                            alert("Pin state reader loaded. Enter timeout and start");
+                          }
+                   
+                          else
+                            console.log(result.return);
+                         },
+                        error:function(result)
+                         {
+                         alert("error");
+                        }
+                    });
+                 });
+
+                 $("#pinstate_wait").click(function(e){
+                     e.preventDefault();
+                     $('#pinstate_status').val('WAITING....')
+                     tout =  $('#pinstate_timeout').val();
+                     $.ajax({type: "GET",
+                         url: "/pru/1/event/"+tout,
+                         dataType: 'json',
+                         success:function(result){
+                          if(result.return == 0){
+                            $('#pinstate_status').val('STATE CHANGED');
+                            alert("Pin state changed on P8.46");
+                          }
+                   
+                          else if (result.return == -62){
+                            $('#pinstate_status').val('TIMER EXPIRED');
+                            alert("Timer expired");
+                          }
+                         else{
+                            $('#pinstate_status').val('ERROR');
+                            alert("Error");
+                         }
+                          },
+                        error:function(result)
+                         {
+                         alert("error");
+                        }
+                    });
+                  });
+                 $("#pinstate_start").click(function(e){
+                     e.preventDefault();
+                     $.ajax({type: "POST",
+                         url: "/pru/1/message",
+                         dataType: 'json',
+                         data: { "message":"S" },
+                         success:function(result){
+                          if(result.return == 0){
+                            $('#pinstate_status').val('STARTED');
+                            $('#pinstate_start').attr('disabled', true);
+                            $('#pinstate_reset').attr('disabled', false);
+                          }
+                          },
+                        error:function(result)
+                         {
+                         alert("error");
+                        }
+                    });
+                  });
+                 $("#pinstate_reset").click(function(e){
+                     e.preventDefault();
+                     $.ajax({type: "GET",
+                         url: "/pru/1/message",
+                         dataType: 'json',
+                         success:function(result){
+                            $('#pinstate_status').val('FLUSHED');
+                          
+                          },
+                        error:function(result)
+                         {
+                         alert("error");
+                        }
+                    });
+                  });
+
             
-               });
+          });
       </script>
    </head>
    <nav class="navbar navbar-default" style="margin:0;">
@@ -262,9 +349,19 @@
             </div>
             <div class="panel-body">
                <h3>Waits for a state change on a pin and sends a message when it occurs</h3>
+               <button id="pinstate_load">LOAD</button>
+               <br><br>
                <div class="panel panel-default">
                   <div class="panel-body">
-                     Basic panel example
+                     <span style="display: block; width: YOURWIDTH;">
+                     <label>Status:</label>&nbsp<input type="text" value="Not Started" readonly="true" id="pinstate_status">&nbsp<button id="pinstate_start">START</button>
+                     &nbsp<button id="pinstate_reset">RESET</button>
+                     <br><br>
+                     <span>
+                     <label>Enter timeout:</label>&nbsp<input type="text" value="" id="pinstate_timeout">
+                     </span>
+                     <button id="pinstate_wait">WAIT</button>
+                     <br><br>
                   </div>
                </div>
             </div>

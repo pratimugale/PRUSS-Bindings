@@ -49,7 +49,7 @@ router.get('/:no([0-1])/message', function(req, res){
 });
 
 
-router.get('/:no([0-1])/event/:time([0-9])?', function(req, res){
+router.get('/:no([0-1])/event/:time([0-9]{2,})?', function(req, res){
 	
 	function eventwait(number, tout, cb){
 		var retr = pru[number].waitForEvent(tout)
