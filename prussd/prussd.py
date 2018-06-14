@@ -140,6 +140,8 @@ def get_msg(cmd):
             #timeout 0 in select => non-blocking read
             while fd in select.select([fd], [], [], 0)[0]:
                 reply += fd.readline()
+        if reply == '':
+            return '\n'
         return reply
     except OSError as err:
         return -err.errno

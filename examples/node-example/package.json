@@ -3,7 +3,8 @@
 	"main": "server.js",
 	"dependencies": {
 		"express": "~4.0.0",
-		"body-parser": "~1.0.1"
+		"body-parser": "~1.0.1",
+		"pruss": "../../node-bindings"
 	}
 	
 

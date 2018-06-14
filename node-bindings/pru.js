@@ -66,11 +66,11 @@ class PRU {
 			return cb? cb(errno.ENODEV): errno.ENODEV;
 		if(this._state == 'RUNNING')
 			return cb? cb(errno.EALREADY): errno.EALREADY;
-		send('DISABLE_'+this._no, (data) => {
+		send('RESUME_'+this._no, (ret) => {
 			ret = parseInt(ret);
 			if(!ret)
 				this._state = 'RUNNING';
-			return cb? cb(data): data;
+			return cb? cb(ret): ret;
 		});
 	}
 	getRegs(cb) {
