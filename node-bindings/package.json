@@ -1,0 +1,13 @@
+{
+  "name": "pruss",
+  "version": "0.1.0",
+  "description": "Bindings to interact with the PRUs on the BeagleBone",
+  "main": "pruss.js",
+  "keywords": [
+    "PRU",
+    "PRUSS",
+    "remoteproc"
+  ],
+  "author": "Muneeb Mohammed",
+  "license": "GPL-3.0"
+}
