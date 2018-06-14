@@ -93,7 +93,7 @@ prussrouter.get('/off', function(req, res){
 app.use('/pru', router);
 app.use('/pruss', prussrouter);
 app.listen(port);
-console.log('server started at port:8888');
+console.log('server started at port:8088');
 
 
 
