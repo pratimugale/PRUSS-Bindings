@@ -26,9 +26,9 @@
 /* Macros */
 
 #define check_host_int(host)\
-			(__R31 & host)
+			(read_r31() & host)
 
 #define generate_sys_eve(sys_eve)\
-			__R31 = ( (1 << R31_VECTOR_VALID_STROBE_BIT) | (SE_PRU1_TO_PRU0-16))
+			write_r31( (1 << R31_VECTOR_VALID_STROBE_BIT) | (SE_PRU1_TO_PRU0-16))
 
 #endif

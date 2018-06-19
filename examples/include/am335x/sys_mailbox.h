@@ -200,6 +200,11 @@ typedef struct {
 
 } sysMailbox;
 
+#ifdef __GNUC__
+static volatile sysMailbox *__CT_MBX = (void *)0x480C8000;
+#define CT_MBX	(*__CT_MBX)
+#else
 volatile __far sysMailbox CT_MBX __attribute__((cregister("MBX0", far), peripheral));
+#endif
 
 #endif /* _SYS_MAILBOX_H_ */

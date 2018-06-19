@@ -1,4 +1,6 @@
 /*
+ * Source Modified by Mohammed Muneeb
+ *
  * Source Modified by Zubeen Tolani < ZeekHuge - zeekhuge@gmail.com >
  * Based on the examples distributed by TI
  *
@@ -43,8 +45,7 @@
 #include <pru_rpmsg.h>
 #include "resource_table_1.h"
 
-
-volatile register uint32_t __R31;
+#include <pru/io.h>
 
 /* Host-1 Interrupt sets bit 31 in register R31 */
 #define HOST_INT				((uint32_t) 1 << 31)	
@@ -85,7 +86,7 @@ uint8_t payload[RPMSG_BUF_SIZE];
 /*
  * main.c
  */
-void main(void)
+int main(void)
 {
 	struct pru_rpmsg_transport transport;
 	uint16_t src, dst, len;
@@ -112,14 +113,14 @@ void main(void)
 	while (pru_rpmsg_channel(RPMSG_NS_CREATE, &transport, CHAN_NAME, CHAN_DESC, CHAN_PORT) != PRU_RPMSG_SUCCESS);
 	while (1) {
 		/* Check bit 30 of register R31 to see if the ARM has kicked us */
-		if (__R31 & HOST_INT) {
+		if (read_r31() & HOST_INT) {
 			/* Clear the event status */
 			CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
 			/* Receive all available messages, multiple messages can be sent per kick */
 			while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len) == PRU_RPMSG_SUCCESS) {	
 				while(1)
-					if ((__R31 ^ prev_gpio_state) & CHECK_BIT) {
-						prev_gpio_state = __R31 & CHECK_BIT;	
+					if ((read_r31() ^ prev_gpio_state) & CHECK_BIT) {
+						prev_gpio_state = read_r31() & CHECK_BIT;
 						pru_rpmsg_send(&transport, dst, src, "CHANGED\n", sizeof("CHANGED\n"));
 					}		
 			}

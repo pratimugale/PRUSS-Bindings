@@ -58,14 +58,21 @@ struct my_resource_table {
 
 	uint32_t offset[1]; /* Should match 'num' in actual definition */
 };
+#if !defined(__GNUC__)
+	#pragma DATA_SECTION(resourceTable, ".resource_table")
+	#pragma RETAIN(resourceTable)
+	#define __resource_table
+#else
+	#define __resource_table __attribute__((section(".resource_table")))
+#endif
 
-#pragma DATA_SECTION(pru_remoteproc_ResourceTable, ".resource_table")
-#pragma RETAIN(pru_remoteproc_ResourceTable)
-struct my_resource_table pru_remoteproc_ResourceTable = {
-	1,	/* we're the first version that implements this */
-	0,	/* number of entries in the table */
-	0, 0,	/* reserved, must be zero */
-	0,	/* offset[0] */
+struct my_resource_table pru_remoteproc_ResourceTable __resource_table = {
+	{
+		1,	/* we're the first version that implements this */
+		0,	/* number of entries in the table */
+		{ 0, 0 },	/* reserved, must be zero */
+	},
+	{ 0 },	/* offset[0] */
 };
 
 #endif /* _RSC_TABLE_PRU_H_ */

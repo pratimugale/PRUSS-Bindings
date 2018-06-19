@@ -1,4 +1,6 @@
 /*
+ * Source modified by Mohammed Muneeb
+ *
  * Copyright (C) 2016 Texas Instruments Incorporated - http://www.ti.com/
  *
  *
@@ -39,7 +41,8 @@
 #include <pru_rpmsg.h>
 #include "resource_table_0.h"
 
-volatile register uint32_t __R31;
+#include <pru/io.h>
+volatile uint32_t R31;
 
 /* Host-0 Interrupt sets bit 30 in register R31 */
 #define HOST_INT			((uint32_t) 1 << 30)
@@ -70,7 +73,7 @@ uint8_t payload[RPMSG_BUF_SIZE];
 /*
  * main.c
  */
-void main(void)
+int main(void)
 {
 	struct pru_rpmsg_transport transport;
 	uint16_t src, dst, len;
@@ -93,7 +96,7 @@ void main(void)
 	while (pru_rpmsg_channel(RPMSG_NS_CREATE, &transport, CHAN_NAME, CHAN_DESC, CHAN_PORT) != PRU_RPMSG_SUCCESS);
 	while (1) {
 		/* Check bit 30 of register R31 to see if the ARM has kicked us */
-		if (__R31 & HOST_INT) {
+		if (read_r31() & HOST_INT) {
 			/* Clear the event status */
 			CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
 			/* Receive all available messages, multiple messages can be sent per kick */

@@ -1,130 +1,86 @@
-# 
-# Copyright (c) 2016 Zubeen Tolani <ZeekHuge - zeekhuge@gmail.com>
-# Makefile to make PRU_inlineASM_blinky project
+# Copyright (c) 2015, Dimitar Dimitrov
+#   All rights reserved.
 #
-# The make file is tried to be made as generic as possible
-# So that it can be used to compile other programs too
-# 
-# Usage:
-#	name your main source file as main_pru1.c or main_pru0.c
-# 	add targets to variable TARGETS
-#	add other files required while linking in variable LINK_PRU1(0)_FW
-#	add compile targets, as added to LINK_PRU1(0)_FW for other files.
-# 
+#   Redistribution and use in source and binary forms, with or without
+#   modification, are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in
+#     the documentation and/or other materials provided with the
+#     distribution.
+#   * Neither the name of the copyright holders nor the names of
+#     contributors may be used to endorse or promote products derived
+#     from this software without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+#  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+#  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+#  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+#  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+#  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+#  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+#  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+#  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#  POSSIBILITY OF SUCH DAMAGE.
 
-# PRU_CGT environment variable must point to the TI PRU compiler directory. E.g.:
-#(Linux) export PRU_CGT=/home/jason/ti/ccs_v6_1_0/ccsv6/tools/compiler/ti-cgt-pru_2.1.0
-#(Windows) set PRU_CGT=C:/TI/ccs_v6_0_1/ccsv6/tools/compiler/ti-cgt-pru_2.1.0
-
-ifndef PRU_CGT
-define ERROR_BODY
-
-************************************************************
-PRU_CGT environment variable is not set. Examples given:
-(Linux) export PRU_CGT=/home/jason/ti/ccs_v6_1_0/ccsv6/tools/compiler/ti-cgt-pru_2.1.0
-(Windows) set PRU_CGT=C:/TI/ccs_v6_0_1/ccsv6/tools/compiler/ti-cgt-pru_2.1.0
-************************************************************
-
-endef
-$(error $(ERROR_BODY))
-endif
-
-
-LINKER_COMMAND_FILE=./AM335x_PRU.cmd
-LIBS=--library=../../lib/rpmsg_lib.lib
-INCLUDE=--include_path=../../include --include_path=../../include/am335x
-STACK_SIZE=0x100
-HEAP_SIZE=0x100
+# Very simple makefile to cross-compile for PRU
 
 
-CFLAGS=-v3 -O2 --display_error_number --endian=little --hardware_mac=on --obj_directory=$(GEN_DIR) --pp_directory=$(GEN_DIR) -ppd -ppa
-LFLAGS=--reread_libs --warn_sections --stack_size=$(STACK_SIZE) --heap_size=$(HEAP_SIZE)
+# Common flags
+CROSS_COMPILE ?= pru-
+CFLAGS += -g -Os
+CFLAGS += -Wall -Wextra
 
+# Headers needed by the TI rpmsg library.
+CFLAGS += -I../../include -I../../include/am335x
 
-GEN_DIR=gen
+# Define this to squeeze code size by removing atexit, exit, constructors
+# and destructors from CRT.
+CFLAGS += -minrt
 
-PRU1_FW		=$(GEN_DIR)/main_pru1_fw.out
-PRU0_FW		=$(GEN_DIR)/main_pru0_fw.out
+# Per-PRU core flags. The -mmcu option will select the correct linker
+# script and will predefine mcu-specific macros.
+CFLAGS0 += -mmcu=am335x.pru0
+CFLAGS1 += -mmcu=am335x.pru1
 
+# List of source files to compile for each PRU core.
+SRC0 := main_pru0.c ../../lib/src/pru_rpmsg.c ../../lib/src/pru_virtqueue.c 
+SRC1 := main_pru1.c
 
-# -----------------------------------------------------
-# Variable to edit in the makefile
+# GCC's -MMD does not yield the needed C dependencies when compiling all
+# C source files at once. So manually list headers here.
+HEADERS := $(wildcard *.h) $(wildcard include/*.h include/*/*.h)
 
-# add the required firmwares to TARGETS
-# TARGETS		=$(PRU1_FW) $(PRU0_FW)
-TARGETS		=$(PRU1_FW) $(PRU0_FW)
+# Where to output compiled objects
+OUT := gen
 
-# add the required files while linkin the FW code
-# required linking files for PRU1
-# LINK_PRU1_FW = (GEN_DIR)/pru1-inline-asm.object (GEN_DIR)/code2_pru1.object
-LINK_PRU1_FW=
+# Final ELF image file names
+ELF0 := $(OUT)/main_pru0_fw.elf
+ELF1 := $(OUT)/main_pru1_fw.elf
 
-# required linking files for PRU1
-# LINK_PRU0_FW = (GEN_DIR)/pru0-inline-asm.object (GEN_DIR)/code2_pru1.object
-LINK_PRU0_FW=
+# ============================ DO NOT TOUCH BELOW ============================
+all: $(ELF0) $(ELF1)
+	@echo Success: $^
 
-#------------------------------------------------------
+%.s : %.elf
+	$(CROSS_COMPILE)objdump -S -d $< > $@
 
+$(OUT):
+	mkdir $(OUT)
 
+$(ELF0): $(SRC0) $(HEADERS) | $(OUT)
+	$(CROSS_COMPILE)gcc $(CFLAGS) $(CFLAGS0) $(SRC0) $(LDFLAGS) -o $@
 
-.PHONY: all
-all: $(TARGETS)
-	@echo '-	Generated firmwares are : $^'
+$(ELF1): $(SRC1) $(HEADERS) | $(OUT)
+	$(CROSS_COMPILE)gcc $(CFLAGS) $(CFLAGS1) $(SRC1) $(LDFLAGS) -o $@
 
-
-$(PRU1_FW): $(GEN_DIR)/main_pru1.object $(LINK_PRU1_FW)
-	@echo 'LD	$^'
-	@$(PRU_CGT)/bin/lnkpru -i$(PRU_CGT)/lib -i$(PRU_CGT)/include $(LFLAGS) -o $@ $^  $(LINKER_COMMAND_FILE) --library=libc.a $(LIBS) $^
-
-
-$(PRU0_FW): $(GEN_DIR)/main_pru0.object $(LINK_PRU0_FW)
-	@echo 'LD	$^' 
-	@$(PRU_CGT)/bin/lnkpru -i$(PRU_CGT)/lib -i$(PRU_CGT)/include $(LFLAGS) -o $@ $^  $(LINKER_COMMAND_FILE) --library=libc.a $(LIBS) $^
-
-
-$(GEN_DIR)/main_pru0.object: main_pru0.c 
-	@mkdir -p $(GEN_DIR)
-	@echo 'CC	$<'
-	@$(PRU_CGT)/bin/clpru --include_path=$(PRU_CGT)/include $(INCLUDE) $(CFLAGS) -fe $@ $<
-
-
-$(GEN_DIR)/main_pru1.object: main_pru1.c
-	@mkdir -p $(GEN_DIR)
-	@echo 'CC	$<'
-	@$(PRU_CGT)/bin/clpru --include_path=$(PRU_CGT)/include $(INCLUDE) $(CFLAGS) -fe $@ $<
-
-
-
-.PHONY: install install-pru1 install-pru0 copy_pru0_fw copy_pru1_fw reboot_pru_1 reboot_pru_0
-
-install: $(patsubst $(GEN_DIR)/main_pru%_fw.out, install-pru%, $(TARGETS))
-
-
-install-pru1: $(PRU1_FW) copy_pru1_fw reboot_pru1
-install-pru0: $(PRU0_FW) copy_pru0_fw reboot_pru0
-
-copy_pru1_fw:
-	@echo '-	copying firmware to /lib/firmware/am335x_pru1_fw'
-	@cp $(PRU1_FW) /lib/firmware/am335x-pru1-fw
-
-copy_pru0_fw: $(PRU0_FW)
-	@echo '-	copying firmware to /lib/firmware/am335x_pru0_fw'
-	@cp $(PRU0_FW) /lib/firmware/am335x-pru0-fw
-
-reboot_pru1:
-	@echo '-	rebooting pru core 1'
-	$(shell echo "4a338000.pru1" > /sys/bus/platform/drivers/pru-rproc/unbind 2> /dev/null)
-	$(shell echo "4a338000.pru1" > /sys/bus/platform/drivers/pru-rproc/bind)
-	@echo "-	pru core 1 is now loaded with $(PRU1_FW)"
-
-reboot_pru0:
-	@echo '-	rebooting pru core 0'
-	$(shell echo "4a334000.pru0" > /sys/bus/platform/drivers/pru-rproc/unbind 2> /dev/null)
-	$(shell echo "4a334000.pru0" > /sys/bus/platform/drivers/pru-rproc/bind)
-	@echo "-	pru core 0 is now loaded with $(PRU0_FW)"
-
-
-.PHONY: clean
 clean:
-	@echo 'CLEAN	.'
-	@rm -rf $(GEN_DIR)
+	$(RM) -fr $(ELF0) $(ELF1) $(OUT)
+
+cscope:
+	cscope -bRk
+
+.PHONY: all clean cscope

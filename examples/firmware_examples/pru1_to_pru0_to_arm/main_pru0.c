@@ -42,17 +42,17 @@
 #include <pru_virtqueue.h>
 #include <pru_rpmsg.h>
  
+#include <pru/io.h>
 #include "resource_table_pru0.h"
 #include "pru_defs.h"
 
-volatile register uint32_t __R31;
 
 #define HOST_ARM_TO_PRU0		HOST0_INT
 #define HOST_PRU1_TO_PRU0		HOST1_INT
 
 uint8_t payload[RPMSG_BUF_SIZE];
 
-void main(void)
+int main(void)
 {
 	struct pru_rpmsg_transport transport;
 	uint16_t src, dst, len;

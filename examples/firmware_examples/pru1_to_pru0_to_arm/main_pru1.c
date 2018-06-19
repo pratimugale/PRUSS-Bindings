@@ -35,14 +35,12 @@
  */
 
 #include <stdint.h>
-#include <pru_cfg.h>
 #include "resource_table_pru1.h"
 
+#include <pru/io.h>
 
-volatile register uint32_t __R30;
-volatile register uint32_t __R31;
 
-void main(void)
+int main(void)
 {
 
 	while (1) {

@@ -239,6 +239,11 @@ typedef struct {
 	};	//0x40
 } pruCfg;
 
+#ifdef __GNUC__
+static volatile pruCfg *__CT_CFG = (void *)0x00026000;
+#define CT_CFG	(*__CT_CFG)
+#else
 volatile __far pruCfg CT_CFG __attribute__((cregister("PRU_CFG", near), peripheral));
+#endif
 
 #endif /* _PRU_CFG_H_ */

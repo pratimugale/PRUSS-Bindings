@@ -1,4 +1,6 @@
 /*
+ * Source Modified by Mohammed Muneeb
+ * 
  * Copyright (C) 2015 Texas Instruments Incorporated - http://www.ti.com/
  *
  *
@@ -32,15 +34,15 @@
  */
 
 #include <stdint.h>
+#include <pru/io.h>
 #include <pru_cfg.h>
 #include "resource_table_empty.h"
 
-volatile register uint32_t __R30;
-volatile register uint32_t __R31;
 
-void main(void)
+int main(void)
 {
 	volatile uint32_t gpio;
+	volatile uint32_t R30 = read_r30();
 
 	/* Clear SYSCFG[STANDBY_INIT] to enable OCP master port */
 	CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
@@ -50,7 +52,8 @@ void main(void)
 
 	/* TODO: Create stop condition, else it will toggle indefinitely */
 	while (1) {
-		__R30 ^= gpio;
+		R30 ^= gpio;
+		write_r30(R30);
 		__delay_cycles(100000000);
 	}
 }
