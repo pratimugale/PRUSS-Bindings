@@ -6,22 +6,6 @@ char command[100];
 
 Socket sock;
 
-/*int main(void){
-     
-    bool x = sock_connect();
-    printf("%i\n",sock.fd);
-    printf("%s\n",sock.socketpath);
-    printf("%d\n", x);
-    
-    char commanda[] = "ENABLE_0";
-    char *ret = sendcmd(commanda);
-    printf("%s\n", ret);
-    PRU p0 = pruss.pru0;
-    PRU p1 = pruss.pru1;
-    void change();
-    return 0;
-}*/
-
 bool sock_connect(){
     sock.fd = -1;
     sock.socketpath = "/tmp/prussd.sock";   
@@ -68,15 +52,18 @@ bool sock_disconnect(){
 
 void PRUSS_init(PRUSS* pruss){
     // This is the constructor for PRUSS in cpp
-    sendcmd("DISABLE_0");
-    sendcmd("DISABLE_1");
+    char disable0[] = "DISABLE_0"; // Otherwise "ISO forbids string constant to char*" warning throws up
+    sendcmd(disable0);
+    char disable1[] = "DISABLE_1";
+    sendcmd(disable1);
     PRUSS_bootUp(pruss);
 }
 
 int PRUSS_bootUp(PRUSS* pruss){
     if(pruss->on)
         return -EALREADY;
-    int ret = atoi(sendcmd("PROBE_RPROC"));
+    char probe[] = "PROBE_RPROC";
+    int ret = atoi(sendcmd(probe));
     //printf("DEBUG rprocprobe%i\n", ret);
     if(!ret){
         pruss->on = true;
@@ -95,7 +82,8 @@ int PRUSS_shutDown(PRUSS* pruss){
         return -EALREADY;
     PRU_disable(&pruss->pru0);
     PRU_disable(&pruss->pru1);
-    int ret = atoi(sendcmd("UNPROBE_RPROC"));
+    char unprobe[] = "UNPROBE_RPROC";
+    int ret = atoi(sendcmd(unprobe));
     if(!ret){
         pruss->on = false;
         pruss->pru0.state = pruss->pru1.state = NONE;
@@ -142,6 +130,7 @@ int PRU_disable(PRU* pru){
         return -EALREADY;
     char tmp[2];
     sprintf(tmp, "%d", pru->number);
+    //char disable[] = "DISABLE_";
     strcpy(command, "DISABLE_");
     strcat(command, tmp);
     int ret = atoi(sendcmd(command));
@@ -211,7 +200,8 @@ int PRU_load(PRU* pru, char* fw){
 
 void PRU_setChannel(PRU* pru){
     pru->chanPort = (pru->number)?31:30;   
-    pru->chanName = "rpmsg_pru";
+    char name[] = "rpmsg_pru"; 
+    strcpy(pru->chanName, name);
 }
 
 int PRU_setChannel(PRU* pru, int port, char* name){

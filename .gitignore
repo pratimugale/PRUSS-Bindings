@@ -45,3 +45,12 @@ MANIFEST
 *.cproject
 *.ccsproject
 *.settings/
+
+# Vim temporary files:
+*.swo
+*.swp
+*.swn
+*.swm
+
+# My temp output file
+a.out

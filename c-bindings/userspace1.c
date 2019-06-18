@@ -15,14 +15,26 @@ int main(){
         */
 
     char temp[50];
-    printf("Enter a word to be sent via the RPMsg channel: ");
-    fgets(temp, 50, stdin);
+    
+    while(true){
+        printf("press 1 to send message; 2 to receive message(if any); 0 to break \n");
+        int x;
+        scanf("%d\n", &x);
+        if (x == 1){
+            printf("Enter a word to be sent via the RPMsg channel: ");
+            fgets(temp, 50, stdin);
 
-    PRU_sendMsg(&p1, temp);
-    PRU_showRegs(&p1);
+            PRU_sendMsg(&p1, temp);
+            PRU_showRegs(&p1);
+        }
+        else if(x == 2){
+            printf("\nReceived Message: %s\n", PRU_getMsg(&p1));
+        }
+        else if(x == 0){
+            PRU_disable(&p1);
+            PRUSS_shutDown(&pruss);
+            return 0;
+        }
+    }
 
-    printf("\nLoopback: %s\n", PRU_getMsg(&p1));
-    PRU_disable(&p1);
-    PRUSS_shutDown(&pruss);
-    return 0;
 }
