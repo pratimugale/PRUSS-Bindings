@@ -40,7 +40,6 @@ struct PRUSS{
     PRU pru1;
 };
 
-void test(PRU*);
 void PRUSS_init(PRUSS *pruss);
 int PRUSS_bootUp(PRUSS *pruss);
 void PRUSS_dest(PRUSS *pruss);
