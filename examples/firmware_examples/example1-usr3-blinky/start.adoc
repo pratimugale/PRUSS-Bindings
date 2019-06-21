@@ -1,0 +1,50 @@
+include::../header.adoc[]
+
+Note: Example from Mark A Yoder's PRU CookBook
+
+=== Blinking an LED
+==== Problem
+You want to make sure everything is set up by blinking an LED.
+
+==== Solution
+The 'hello, world' of the embedded world is to flash an LED. <<start_hello>> 
+is some code that blinks the `USR3` LED five times using the PRU.
+
+// TODO The *'s and _'s in the code are messing with the formatting.
+
+[[start_hello]]
+.hello.c
+[source,c,linenums]
+[subs=+quotes]
+----
+include::code/hello.c[]
+----
+
+Later chapters will go into details of how this code works, but if you want 
+to run it right now do the following.
+
+[[start_running_code]]
+.Running Code
+[source]
+[subs=+quotes]
+----
+bone$ *git clone https://github.com/MarkAYoder/PRUCookbook.git*
+bone$ *cd PRUCookbook/docs/02start/code*
+bone$ *source setup.sh*
+PRUN=0
+TARGET=hello
+bone$ *make*
+-    Stopping PRU 0
+[sudo] password for debian: 
+stop
+CC	hello.c
+LD	/tmp/pru0-gen/hello.obj
+-	copying firmware file /tmp/pru0-gen/hello.out to /lib/firmware/am335x-pru0-fw
+-    Starting PRU 0
+start
+----
+
+Look quickly and you will see the `USR3` LED blinking.  
+
+=== Note: 
+To execute the program using the second PRU (PRU2), change PRUN=0 to PRUN=1 in source.sh
