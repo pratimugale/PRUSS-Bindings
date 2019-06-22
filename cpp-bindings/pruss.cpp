@@ -241,3 +241,12 @@ int PRU::waitForEvent(int time)
 }
 
 
+string PRU::mem_read(Memory mem, string offset){
+    if (mem == SHARED)
+        return this->sock.sendcmd("MEMREAD_S "+offset);
+
+    else if (mem == DATA0 || mem == DATA1)
+        return this->sock.sendcmd("MEMREAD_D"+to_string(mem)+" "+offset);
+    else 
+        return to_string(-EINVAL);
+}

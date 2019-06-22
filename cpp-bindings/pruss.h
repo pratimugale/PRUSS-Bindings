@@ -18,6 +18,14 @@ enum State
 	HALTED
 };
 
+//enumeration which describes which memory is required to access
+enum Memory
+{
+    DATA0 = 0,
+    DATA1 = 1,
+    SHARED = 3
+};
+
 //socket class
 class Socket
 {
@@ -59,6 +67,8 @@ class PRU
 		std::string getMsg();
 		int waitForEvent();
 		int waitForEvent(int);
+                std::string mem_read(Memory mem, std::string);
+                int mem_write(std::string);
 };
 
 class PRUSS
