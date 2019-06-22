@@ -228,7 +228,27 @@ def mem_read(ram, cmd):
     return data
 
 def mem_write():
-    print(cmd)
+    try:
+        addr_offset = int(cmd[1], 16)
+        data = int(cmd[2], 16)
+    except ValueError:
+        return -errno.EINVAL
+
+    if ram == 0:
+        base = PRU_DRAM0
+    #add offset check
+    elif ram == 1:
+        base = PRU_DRAM1
+    elif ram == 3:
+        base = PRU_SRAM
+
+    with open('/dev/mem', 'r+b') as fd:
+        pru_mem = mmap.mmap(fd.fileno(), PRU_ICSS_SIZE, offset=PRU_ICSS)
+        pru_mem[base+address: base+address+1] = struct.pack('B', data)
+        pru_mem.close()
+        fd.close()
+
+    return 0
 
 class PRURequestHandler(socketserver.StreamRequestHandler):
     """
