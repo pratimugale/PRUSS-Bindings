@@ -68,7 +68,7 @@ class PRU
 		int waitForEvent();
 		int waitForEvent(int);
                 std::string mem_read(Memory mem, std::string);
-                int mem_write(std::string);
+                int mem_write(Memory mem, std::string, int data);
 };
 
 class PRUSS
