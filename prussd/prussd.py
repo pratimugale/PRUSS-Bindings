@@ -18,6 +18,14 @@ import stat
 import socketserver
 import subprocess
 import threading
+import mmap     # For memory functions
+import struct   # For memory functions 
+
+PRU_ICSS     = 0x4a300000     # This is the address of the PRU Subsystem on the RAM
+PRU_ICSS_SIZE = 512*1024      # This is the length of the PRU subsystem ie it is of 512 K
+PRU_DRAM0    = 0x00000000     # Data RAM of PRU0 (8KB)- Refer /Documentation/pru_memory+dma_walkthrough.md 
+PRU_DRAM1    = 0x00002000     # Data RAM of PRU1 (8KB)
+PRU_SRAM     = 0x00010000     # Shared PRU RAM   (12KB)
 
 class paths:
     CONFIG_FILE = "/etc/default/prussd.conf"
@@ -197,6 +205,51 @@ def event_wait(cmd):
     except OSError as err:
         return -err.errno
 
+def mem_read(ram, cmd):
+    try:
+        addr_offset = int(cmd[1], 16)
+    except ValueError:
+        return -errno.EINVAL
+
+    if ram == 0:
+        base = PRU_DRAM0
+    #add offset check
+    elif ram == 1:
+        base = PRU_DRAM1
+    elif ram == 3:
+        base = PRU_SRAM
+
+    with open('/dev/mem', 'r+b') as fd:
+        pru_mem = mmap.mmap(fd.fileno(), PRU_ICSS_SIZE, offset=PRU_ICSS)
+        data = struct.unpack('B', pru_mem[base+addr_offset: base+addr_offset+1])[0]
+        pru_mem.close()
+        fd.close()
+
+    return data
+
+def mem_write():
+    try:
+        addr_offset = int(cmd[1], 16)
+        data = int(cmd[2], 16)
+    except ValueError:
+        return -errno.EINVAL
+
+    if ram == 0:
+        base = PRU_DRAM0
+    #add offset check
+    elif ram == 1:
+        base = PRU_DRAM1
+    elif ram == 3:
+        base = PRU_SRAM
+
+    with open('/dev/mem', 'r+b') as fd:
+        pru_mem = mmap.mmap(fd.fileno(), PRU_ICSS_SIZE, offset=PRU_ICSS)
+        pru_mem[base+address: base+address+1] = struct.pack('B', data)
+        pru_mem.close()
+        fd.close()
+
+    return 0
+
 class PRURequestHandler(socketserver.StreamRequestHandler):
     """
     The request handler class for our socket server
@@ -233,6 +286,12 @@ class PRURequestHandler(socketserver.StreamRequestHandler):
             "GETMSG": lambda: get_msg(cmd),
             "SENDMSG": lambda: send_msg(cmd),
             "EVENTWAIT": lambda: event_wait(cmd)
+            "MEMWRITE_D0": lambda: mem_write(0, cmd),
+            "MEMWRITE_D1": lambda: mem_write(1, cmd),
+            "MEMWRITE_S": lambda: mem_write(3, cmd),
+            "MEMREAD_D0": lambda: mem_read(0, cmd),
+            "MEMREAD_D1": lambda: mem_read(1, cmd),
+            "MEMREAD_S": lambda: mem_read(3, cmd)
             }
 
         resp = cmds[cmd[0]]() if cmd[0] in cmds else -errno.EINVAL
