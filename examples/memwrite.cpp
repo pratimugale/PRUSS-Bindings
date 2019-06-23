@@ -13,13 +13,13 @@ int main()
 	else
 		return -1;*/
         //p1.mem_read();
+
         cout<< "Enter address offset"<<endl;
         string offset;
         cin>>offset;
-        Memory mem = DATA0;
+        Memory mem = SHARED;
         cout << mem<<endl;
-        cout<< "Test: "<<p1.mem_read(mem, offset)<<endl<<endl;
+        cout<< "Test: "<<p1.mem_write(mem, offset, 14)<<endl<<endl;
 	p1.disable();
 	p.shutDown();
-
 }
