@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <pru_cfg.h>
 #include "resource_table_empty.h"
+#define PRU_SHARED 0x00010000
 
 volatile register uint32_t __R30;
 volatile register uint32_t __R31;
@@ -33,14 +34,26 @@ int calcCycles_V(float v, int offCycles){
 }
 
 void main(void){
+
     uint32_t gpio;
 
     CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
+    
+    // TEST ZONE
+    volatile int* buffer = (volatile int *) PRU_SHARED;
+    buffer[0] = 0xEA;
+    buffer[1] = 0xAA;
+    
+    
+    
+    // ZONE ENDS
+
+
 
     gpio = 0x0001;
 
     int offCycles = 10000; 
-    int onCycles = calcCycles_V(1.6, offCycles);
+    int onCycles = calcCycles_V(1.2, offCycles);
 
     while(1){
         __R30 |= gpio;
