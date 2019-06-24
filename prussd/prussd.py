@@ -244,7 +244,7 @@ def mem_write():
 
     with open('/dev/mem', 'r+b') as fd:
         pru_mem = mmap.mmap(fd.fileno(), PRU_ICSS_SIZE, offset=PRU_ICSS)
-        pru_mem[base+address: base+address+1] = struct.pack('B', data)
+        pru_mem[base+addr_offset: base+addr_offset+1] = struct.pack('B', data)
         pru_mem.close()
         fd.close()
 

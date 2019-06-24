@@ -250,9 +250,9 @@ string PRU::mem_read(Memory mem, string offset){
         return to_string(-EINVAL);
 }
 
-int mem_write(Memory mem, string offset, int data){
+string PRU::mem_write(Memory mem, string offset, int data){
     if (mem == SHARED)
-        return this->sock.sendcmd("MEMWRITE_S "+offset);
+        return this->sock.sendcmd("MEMWRITE_S "+offset+" "+to_string(data));
     else if (mem == DATA0 || mem == DATA1)
         return this->sock.sendcmd("MEMWRITE_D"+to_string(mem)+" "+offset+" "+to_string(data));
     else 
