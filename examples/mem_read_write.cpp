@@ -7,16 +7,16 @@ int main()
 {
 	PRUSS& p = PRUSS::get();
 	PRU p1 = p.pru1;
-	p1.enable();
-	/*if(!p1.load("./firmware_examples/rpmsg_echo/gen/rpmsg_echo.out"))
+	//p1.enable();
+	/*if(!p1.load("/tmp/pru0-gen/pwm2.out"))
 		cout << "Firmware loaded\n";
 	else
-		return -1;*/
+		return 1;*/
         //p1.mem_read();
-
+        
         int x;
         string offset;
-        int data;
+        string data;
         Memory mem = SHARED;
 
         cout<<"1: Read; 2: Write; 0: Exit"<<endl;
