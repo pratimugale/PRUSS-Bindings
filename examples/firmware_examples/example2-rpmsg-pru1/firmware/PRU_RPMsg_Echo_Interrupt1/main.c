@@ -37,6 +37,7 @@
 #include <pru_intc.h>
 #include <rsc_types.h>
 #include <pru_rpmsg.h>
+#include <string.h>
 #include "resource_table_1.h"
 
 volatile register uint32_t __R31;
@@ -69,7 +70,7 @@ volatile register uint32_t __R31;
  */
 #define VIRTIO_CONFIG_S_DRIVER_OK	4
 
-uint8_t payload[50];
+uint8_t payload[RPMSG_BUF_SIZE];
 
 /*
  * main.c
@@ -103,8 +104,9 @@ void main(void)
 			/* Clear the event status */
 			CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
 			/* Receive all available messages, multiple messages can be sent per kick */
-			while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len) == PRU_RPMSG_SUCCESS) {
+			while (pru_rpmsg_receive(&transport, &src, &dst, payload[0], &len) == PRU_RPMSG_SUCCESS) {
 				/* Echo the message back to the same address from which we just received */
+                                strcpy((char *)payload, "Hello Cortex-A8!");
 				pru_rpmsg_send(&transport, dst, src, payload, len);
 			}
 		}
