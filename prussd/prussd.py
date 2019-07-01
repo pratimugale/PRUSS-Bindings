@@ -285,7 +285,7 @@ class PRURequestHandler(socketserver.StreamRequestHandler):
             "LOAD_1": lambda: load_firmware(1, cmd),
             "GETMSG": lambda: get_msg(cmd),
             "SENDMSG": lambda: send_msg(cmd),
-            "EVENTWAIT": lambda: event_wait(cmd)
+            "EVENTWAIT": lambda: event_wait(cmd),
             "MEMWRITE_D0": lambda: mem_write(0, cmd),
             "MEMWRITE_D1": lambda: mem_write(1, cmd),
             "MEMWRITE_S": lambda: mem_write(3, cmd),
