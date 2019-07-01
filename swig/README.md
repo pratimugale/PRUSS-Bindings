@@ -1,5 +1,6 @@
 # Swig
 Swig is a tool to generate language bindings. It can be used to create interfaces for C/C++ code in various languages.
+Also have a look at `using_swig.md`
 
 ## Description
 This directory contains the C++ code along with the Swig interface file to generate bindings for the PRUSS.

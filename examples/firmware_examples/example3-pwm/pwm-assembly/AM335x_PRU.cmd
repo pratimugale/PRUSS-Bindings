@@ -1,10 +1,10 @@
 /****************************************************************************/
-/*  AM437x_PRU_SS1.cmd                                                      */
-/*  Copyright (c) 2015-2018  Texas Instruments Incorporated                 */
+/*  AM335x_PRU.cmd                                                          */
+/*  Copyright (c) 2015  Texas Instruments Incorporated                      */
 /*                                                                          */
 /*    Description: This file is a linker command file that can be used for  */
 /*                 linking PRU programs built with the C compiler and       */
-/*                 the resulting .out file on an AM437x device.             */
+/*                 the resulting .out file on an AM335x device.             */
 /****************************************************************************/
 
 -cr								/* Link using C conventions */
@@ -13,7 +13,7 @@
 MEMORY
 {
       PAGE 0:
-	PRU_IMEM		: org = 0x00000000 len = 0x00003000  /* 12kB PRU-ICSS1 Instruction RAM */
+	PRU_IMEM		: org = 0x00000000 len = 0x00002000  /* 8kB PRU0 Instruction RAM */
 
       PAGE 1:
 
@@ -23,15 +23,15 @@ MEMORY
 	PRU_DMEM_1_0	: org = 0x00002000 len = 0x00002000	CREGISTER=25 /* 8kB PRU Data RAM 1_0 */
 
 	  PAGE 2:
-	PRU_SHAREDMEM	: org = 0x00010000 len = 0x00008000 CREGISTER=28 /* 32kB Shared RAM */
+	PRU_SHAREDMEM	: org = 0x00010000 len = 0x00003000 CREGISTER=28 /* 12kB Shared RAM */
 
-	DDR			    : org = 0x80000000 len = 0x00010000	CREGISTER=31
+	DDR			    : org = 0x80000000 len = 0x00000100	CREGISTER=31
 	L3OCMC			: org = 0x40000000 len = 0x00010000	CREGISTER=30
 
 
 	/* Peripherals */
 
-	PRU_CFG			: org = 0x00026000 len = 0x00000120	CREGISTER=4
+	PRU_CFG			: org = 0x00026000 len = 0x00000044	CREGISTER=4
 	PRU_ECAP		: org = 0x00030000 len = 0x00000060	CREGISTER=3
 	PRU_IEP			: org = 0x0002E000 len = 0x0000031C	CREGISTER=26
 	PRU_INTC		: org = 0x00020000 len = 0x00001504	CREGISTER=0
@@ -50,7 +50,7 @@ MEMORY
 	MCASP0_DMA		: org = 0x46000000 len = 0x00000100	CREGISTER=8
 	MCSPI0			: org = 0x48030000 len = 0x000001A4	CREGISTER=6
 	MCSPI1			: org = 0x481A0000 len = 0x000001A4	CREGISTER=16
-	MMCSD0			: org = 0x48060000 len = 0x00000300	CREGISTER=5
+	MMCHS0			: org = 0x48060000 len = 0x00000300	CREGISTER=5
 	SPINLOCK		: org = 0x480CA000 len = 0x00000880	CREGISTER=23
 	TPCC			: org = 0x49000000 len = 0x00001098	CREGISTER=29
 	UART1			: org = 0x48022000 len = 0x00000088	CREGISTER=11

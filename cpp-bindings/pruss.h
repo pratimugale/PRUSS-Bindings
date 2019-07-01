@@ -68,7 +68,7 @@ class PRU
 		int waitForEvent();
 		int waitForEvent(int);
                 std::string mem_read(Memory mem, std::string);
-                std::string mem_write(Memory mem, std::string, int data);
+                std::string mem_write(Memory mem, std::string, std::string);
 };
 
 class PRUSS
@@ -88,5 +88,4 @@ class PRUSS
 		void restart();
 
 };
-
 #endif

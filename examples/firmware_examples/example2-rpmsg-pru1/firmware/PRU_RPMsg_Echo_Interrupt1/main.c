@@ -37,6 +37,7 @@
 #include <pru_intc.h>
 #include <rsc_types.h>
 #include <pru_rpmsg.h>
+#include <string.h>
 #include "resource_table_1.h"
 
 volatile register uint32_t __R31;
@@ -57,8 +58,8 @@ volatile register uint32_t __R31;
  * Using the name 'rpmsg-pru' will probe the rpmsg_pru driver found
  * at linux-x.y.z/drivers/rpmsg/rpmsg_pru.c
  */
-#define CHAN_NAME			"rpmsg-client-sample"
-//#define CHAN_NAME			"rpmsg-pru"
+//#define CHAN_NAME			"rpmsg-client-sample"
+#define CHAN_NAME			"rpmsg-pru"
 
 #define CHAN_DESC			"Channel 31"
 #define CHAN_PORT			31
@@ -69,7 +70,7 @@ volatile register uint32_t __R31;
  */
 #define VIRTIO_CONFIG_S_DRIVER_OK	4
 
-uint8_t payload[RPMSG_MESSAGE_SIZE];
+uint8_t payload[RPMSG_BUF_SIZE];
 
 /*
  * main.c
@@ -80,8 +81,13 @@ void main(void)
 	uint16_t src, dst, len;
 	volatile uint8_t *status;
 
+	/* AM335x must enable OCP master port access in order for the PRU to
+	 * read external memories.
+	 */
+	CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
+
 	/* Clear the status of the PRU-ICSS system event that the ARM will use to 'kick' us */
-	CT_INTC.SICR_bit.STATUS_CLR_INDEX = FROM_ARM_HOST;
+	CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
 
 	/* Make sure the Linux drivers are ready for RPMsg communication */
 	status = &resourceTable.rpmsg_vdev.status;
@@ -96,10 +102,11 @@ void main(void)
 		/* Check bit 31 of register R31 to see if the ARM has kicked us */
 		if (__R31 & HOST_INT) {
 			/* Clear the event status */
-			CT_INTC.SICR_bit.STATUS_CLR_INDEX = FROM_ARM_HOST;
+			CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
 			/* Receive all available messages, multiple messages can be sent per kick */
-			while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len) == PRU_RPMSG_SUCCESS) {
+			while (pru_rpmsg_receive(&transport, &src, &dst, payload[0], &len) == PRU_RPMSG_SUCCESS) {
 				/* Echo the message back to the same address from which we just received */
+                                strcpy((char *)payload, "Hello Cortex-A8!");
 				pru_rpmsg_send(&transport, dst, src, payload, len);
 			}
 		}
