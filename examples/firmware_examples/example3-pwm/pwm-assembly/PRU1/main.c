@@ -113,12 +113,14 @@ void main(void)
 			/* Receive all available messages, multiple messages can be sent per kick */
 			while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len) == PRU_RPMSG_SUCCESS) {
 
+                                /* Receive 8 bytes of data (64 bits); 4 bytes for each raw integer present in the message */
                                 uint64_t x = *(uint64_t *) payload;
+                                
+                                /* Store the 2 4-byte integers at memory locations 0x00010000 to 0x00010007
+                                 * PRU cycles for which GPIO is set: (0x00010000 to 0x00010003)
+                                 * Total Cycles for 1 sample of PWM: (0x00010004 to 0x00010007)*/
                                 *(sram_pointer) = x; 
                                 
-                                //char *str = "The integer was written at the memory location";
-                                
-				//pru_rpmsg_send(&transport, dst, src, str, strlen(str));
 			}
 		}
 	}

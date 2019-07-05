@@ -3,7 +3,7 @@
 ;* The 4 byte ON_Cycles input must be in memory location 0x00010000 - 0x00010003 in little-endian byte order
 ;* The 4 byte Total_Cycles input must be in memory location 0x00010004 - 0x00010007 in little endian byte order
 
-	.cdecls "main_pru1.c"
+	.cdecls "main_pru0.c"
 
 PRU_SRAM .set 0x00010000            ; Set the location of PRU Shared Memory
 

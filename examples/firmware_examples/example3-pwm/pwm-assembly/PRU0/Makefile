@@ -1,10 +1,6 @@
 # 
 # Copyright (c) 2016 Zubeen Tolani <ZeekHuge - zeekhuge@gmail.com>
-# Makefile to make PRU_inlineASM_blinky project
 #
-# The make file is tried to be made as generic as possible
-# So that it can be used to compile other programs too
-# 
 # Usage:
 #	name your main source file as main_pru1.c or main_pru0.c
 # 	add targets to variable TARGETS
@@ -12,10 +8,7 @@
 #	add compile targets, as added to LINK_PRU1(0)_FW for other files.
 # 
 
-# PRU_CGT environment variable must point to the TI PRU compiler directory. E.g.:
-#(Linux) export PRU_CGT=/home/jason/ti/ccs_v6_1_0/ccsv6/tools/compiler/ti-cgt-pru_2.1.0
-#(Windows) set PRU_CGT=C:/TI/ccs_v6_0_1/ccsv6/tools/compiler/ti-cgt-pru_2.1.0
-
+# PRU_CGT environment variable points to the TI PRU compiler directory. (Usually /usr/share/ti/cgt-pru)
 PRU_CGT:=/usr/share/ti/cgt-pru
 
 ifndef PRU_CGT
@@ -46,7 +39,6 @@ LFLAGS=--reread_libs --warn_sections --stack_size=$(STACK_SIZE) --heap_size=$(HE
 
 GEN_DIR=gen
 
-PRU1_FW		=$(GEN_DIR)/main_pru1_fw.out
 PRU0_FW		=$(GEN_DIR)/main_pru0_fw.out
 
 
@@ -55,16 +47,16 @@ PRU0_FW		=$(GEN_DIR)/main_pru0_fw.out
 
 # add the required firmwares to TARGETS
 # TARGETS		=$(PRU1_FW) $(PRU0_FW)
-TARGETS		=$(PRU1_FW)
+TARGETS		=$(PRU0_FW)
 
 # add the required files while linkin the FW code
 # required linking files for PRU1
 # LINK_PRU1_FW = (GEN_DIR)/pru1-inline-asm.object (GEN_DIR)/code2_pru1.object
-LINK_PRU1_FW= $(GEN_DIR)/pru-asm-pwm.object
+# LINK_PRU1_FW= $(GEN_DIR)/pru-asm-pwm.object
 
 # required linking files for PRU1
 # LINK_PRU0_FW = (GEN_DIR)/pru0-inline-asm.object (GEN_DIR)/code2_pru1.object
-LINK_PRU0_FW=
+LINK_PRU0_FW= $(GEN_DIR)/pru-asm-pwm.object
 
 #------------------------------------------------------
 
