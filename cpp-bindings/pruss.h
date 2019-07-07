@@ -18,7 +18,7 @@ enum State
 	HALTED
 };
 
-//enumeration which describes which memory is required to access
+//enumeration which describes which memory access is required
 enum Memory
 {
     DATA0 = 0,
@@ -63,7 +63,8 @@ class PRU
 		void setChannel();
 		int setChannel(int, std::string);
 		State getState();
-		int sendMsg(std::string);
+                int sendMsg_string(std::string);
+                void sendMsg_raw(std::string);
 		std::string getMsg();
 		int waitForEvent();
 		int waitForEvent(int);
