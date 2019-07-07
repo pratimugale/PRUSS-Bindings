@@ -219,10 +219,16 @@ State PRU::getState()
 	return this->state;
 }
 
-int PRU::sendMsg(string message)
+int PRU::sendMsg_string(string message)
 {
-	string cmd = "SENDMSG "+this->chanName+" "+to_string(this->chanPort)+" "+message;
-	return stoi(this->sock.sendcmd(cmd)); // eg. sendmsg rpmsg_pru 31 hi!
+        string cmd = "SENDMSG s "+this->chanName+" "+to_string(this->chanPort)+" "+message;
+        return stoi(this->sock.sendcmd(cmd)); // eg. sendmsg s rpmsg_pru 31 hi!
+}
+
+void PRU::sendMsg_raw(string message)
+{
+        string cmd = "SENDMSG r "+this->chanName+" "+to_string(this->chanPort)+" "+message;
+        this->sock.sendcmd(cmd); // eg. sendmsg r rpmsg_pru 31 1281
 }
 
 string PRU::getMsg()

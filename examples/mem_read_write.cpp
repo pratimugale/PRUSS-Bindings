@@ -7,7 +7,7 @@ int main()
 {
 	PRUSS& p = PRUSS::get();
 	PRU p0 = p.pru0;
-	p0.enable();
+	//p0.enable();
 	/*if(!p1.load("/tmp/pru0-gen/pwm2.out"))
 		cout << "Firmware loaded\n";
 	else

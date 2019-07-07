@@ -104,9 +104,8 @@ void main(void)
 			/* Clear the event status */
 			CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
 			/* Receive all available messages, multiple messages can be sent per kick */
-			while (pru_rpmsg_receive(&transport, &src, &dst, payload[0], &len) == PRU_RPMSG_SUCCESS) {
+			while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len) == PRU_RPMSG_SUCCESS) {
 				/* Echo the message back to the same address from which we just received */
-                                strcpy((char *)payload, "Hello Cortex-A8!");
 				pru_rpmsg_send(&transport, dst, src, payload, len);
 			}
 		}

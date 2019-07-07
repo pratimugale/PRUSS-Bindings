@@ -157,26 +157,35 @@ def get_msg(cmd):
 
 def send_msg(cmd):
     """Sends a message on the specified rpmsg channel."""
-    if len(cmd) < 4:
+    if len(cmd) < 5:
         return -errno.EINVAL
     try:
-        chan_name = str(cmd[1])
-        chan_port = int(cmd[2])
+        mode = str(cmd[1])
+        chan_name = str(cmd[2])
+        chan_port = int(cmd[3])
+        int_data = int(cmd[4])
     except ValueError:
         return -errno.EINVAL
-
+                                                                        
     rpmsg_dev = rpmsg_devnode(chan_name, chan_port)
     if chan_name not in paths.RPMSG_CHANNELS:
         return -errno.EPERM
     if not os.path.exists(rpmsg_dev):
         return -errno.ENODEV
-    try:
-        with open(rpmsg_dev, 'w') as fd:
-            fd.write(' '.join(cmd[3:])+'\n')
-            return 0
-    except OSError as err:
-        return -err.errno
 
+    if mode == 's':
+        try:
+            with open(rpmsg_dev, 'w') as fd:
+                fd.write(' '.join(cmd[4:])+'\n')
+                return 0
+        except OSError as err:
+            return -err.errno
+    elif mode == 'r':
+        try:
+            with open(rpmsg_dev, 'wb') as fd:
+                fd.write(struct.pack('i', int_data))
+        except OSError as err:
+            return -err.errno
 
 def event_wait(cmd):
     """Waits for an event on the specified rpmsg channel."""
