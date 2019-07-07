@@ -80,6 +80,7 @@ void* payload[RPMSG_BUF_SIZE];
 /*
  * main.c
  */
+
 void main(void)
 {
 	struct pru_rpmsg_transport transport;
@@ -91,7 +92,8 @@ void main(void)
 	 */
 	CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
 
-        volatile uint64_t* sram_pointer = (volatile uint64_t *) PRU_SRAM;
+        volatile uint32_t* sram_pointer = (volatile uint32_t *) PRU_SRAM;
+        int i = 0;
 
 	/* Clear the status of the PRU-ICSS system event that the ARM will use to 'kick' us */
 	CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
@@ -110,18 +112,17 @@ void main(void)
 		if (__R31 & HOST_INT) {
 			/* Clear the event status */
 			CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
-			/* Receive all available messages, multiple messages can be sent per kick */
-			while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len) == PRU_RPMSG_SUCCESS) {
 
-                                /* Receive 8 bytes of data (64 bits); 4 bytes for each raw integer present in the message */
-                                uint64_t x = *(uint64_t *) payload;
-                                
-                                /* Store the 2 4-byte integers at memory locations 0x00010000 to 0x00010007
-                                 * PRU cycles for which GPIO is set: (0x00010000 to 0x00010003)
-                                 * Total Cycles for 1 sample of PWM: (0x00010004 to 0x00010007)*/
-                                *(sram_pointer) = x; 
-                                
-			}
+			/* Receive one message*/
+			while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len)==PRU_RPMSG_SUCCESS){
+                        
+                            uint32_t x = *(uint32_t *) payload;
+
+                            *(sram_pointer+i) = x; 
+                            i++;
+
+                        }
 		}
 	}
+	
 }
