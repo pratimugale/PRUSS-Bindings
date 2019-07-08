@@ -7,32 +7,40 @@ int main()
 {
 	PRUSS& p = PRUSS::get();
 	PRU p1 = p.pru1;
-	p1.enable();            // Starts PRU1 (rpmsg_pru31 character device file is created here)
+        
+        // Start PRU1 core which stores input values into PRU SRAM.
+	p1.enable();            
 
-	string s;
         float frequency;
 	cout << "Frequency of PWM in Hz (from 1Hz to 1MHz): "<<endl;
         cin>>frequency;
         float multiplier = 1000000.0/frequency;
 
         float duty_cycle;
-        cout<< "Duty Cycle of PWM "<<endl;
+        cout<< "Duty Cycle of PWM (0 to 1)"<<endl;
         cin>>duty_cycle;
+        
+        // Invalid Duty Cycle.
+        if(duty_cycle > 1 || duty_cycle < 0){
+            return -1;
+        }
 
+        // Base values for highest frequency of 1MHz.
         float on_samples = duty_cycle * 100;
         float total_samples = 100;
 
+        // Adjusted values for frequencies less than 1MHz
         on_samples *= multiplier;
         total_samples *= multiplier;
 
         cout<<"On Cycles/2 = "<<(int)on_samples<<endl;
         cout<<"Total Cycles/2 = "<<(int)total_samples<<endl;
 
-	p1.sendMsg_raw(to_string((int)on_samples));
-        p1.getMsg();
+        // Write binary integers to the character device file.
+	p1.sendMsg_raw(to_string((int)on_samples));         
 	p1.sendMsg_raw(to_string((int)total_samples));
-        p1.getMsg();
 
+        // Start PRU0 core which executes the PWM assembly code.
         PRU p0 = p.pru0;
         p0.enable();
 
