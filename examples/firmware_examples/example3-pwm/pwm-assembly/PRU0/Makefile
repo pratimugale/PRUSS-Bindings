@@ -96,13 +96,13 @@ $(GEN_DIR)/pru-asm-pwm.object: pru-asm-pwm.asm
 
 
 
-.PHONY: install install-pru1 install-pru0 copy_pru0_fw copy_pru1_fw reboot_pru_1 reboot_pru_0
+.PHONY: install install-pru1 install-pru0 copy_pru0_fw copy_pru1_fw 
 
 install: $(patsubst $(GEN_DIR)/main_pru%_fw.out, install-pru%, $(TARGETS))
 
 
-install-pru1: $(PRU1_FW) copy_pru1_fw reboot_pru1
-install-pru0: $(PRU0_FW) copy_pru0_fw reboot_pru0
+install-pru1: $(PRU1_FW) copy_pru1_fw 
+install-pru0: $(PRU0_FW) copy_pru0_fw 
 
 copy_pru1_fw:
 	@echo '-	copying firmware to /lib/firmware/am335x_pru1_fw'
@@ -111,18 +111,6 @@ copy_pru1_fw:
 copy_pru0_fw: $(PRU0_FW)
 	@echo '-	copying firmware to /lib/firmware/am335x_pru0_fw'
 	@cp $(PRU0_FW) /lib/firmware/am335x-pru0-fw
-
-reboot_pru1:
-	@echo '-	rebooting pru core 1'
-	$(shell echo "4a338000.pru1" > /sys/bus/platform/drivers/pru-rproc/unbind 2> /dev/null)
-	$(shell echo "4a338000.pru1" > /sys/bus/platform/drivers/pru-rproc/bind)
-	@echo "-	pru core 1 is now loaded with $(PRU1_FW)"
-
-reboot_pru0:
-	@echo '-	rebooting pru core 0'
-	$(shell echo "4a334000.pru0" > /sys/bus/platform/drivers/pru-rproc/unbind 2> /dev/null)
-	$(shell echo "4a334000.pru0" > /sys/bus/platform/drivers/pru-rproc/bind)
-	@echo "-	pru core 0 is now loaded with $(PRU0_FW)"
 
 
 .PHONY: clean
