@@ -36,9 +36,9 @@ int main()
             default:
                 break;
         }
-//        p.bootUp();
-  //      p0.enable();
-        //p.restart();
+//      p.bootUp();
+//      p0.enable();
+//      p.restart();
 //	p1.disable();
 //	p.shutDown();
 }

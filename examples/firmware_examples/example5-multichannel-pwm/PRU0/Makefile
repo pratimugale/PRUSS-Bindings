@@ -112,7 +112,6 @@ copy_pru0_fw: $(PRU0_FW)
 	@echo '-	copying firmware to /lib/firmware/am335x_pru0_fw'
 	@cp $(PRU0_FW) /lib/firmware/am335x-pru0-fw
 
-
 .PHONY: clean
 clean:
 	@echo 'CLEAN	.'
