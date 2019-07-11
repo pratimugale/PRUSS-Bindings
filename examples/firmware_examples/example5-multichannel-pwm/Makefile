@@ -7,8 +7,9 @@ install:
 	@config-pin P9-31 pruout
 	@cd ./PRU0/ && make
 	@cd ./PRU0/ && sudo make install
-	#@cd ./PRU1/ && make
-	#@sudo python userspace_pwm.py
+	@cd ./PRU1/ && make
+	@g++ userspace.cpp ../../../cpp-bindings/pruss.cpp
+	@./a.out
 
 clean:
 	@cd ./PRU0/ && make clean

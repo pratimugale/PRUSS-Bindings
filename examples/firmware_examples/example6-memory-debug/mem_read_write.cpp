@@ -15,6 +15,27 @@ int main()
         // Choose which memory access is needed - read the enum from pruss.h
         Memory mem = SHARED;
 
+        cout<<"Choose Base Location:"<<endl;
+        cout<<"1: DRAM0; 2: DRAM1; 3: SRAM"<<endl;
+
+        cin>>x;
+        switch(x){
+            case 1:
+                mem = DATA0;
+                cout<< "Base Location: 0x0000 0000"<<endl;
+                break;
+            case 2:
+                mem = DATA1;
+                cout<< "Base Location: 0x0000 2000"<<endl;
+                break;
+            case 3: 
+                mem = SHARED;
+                cout<< "Base Location: 0x0001 0000"<<endl;
+                break;
+            default:
+                break;
+        }
+
         cout<<"1: Read; 2: Write; 0: Exit"<<endl;
         cin>>x;
         switch(x){
@@ -33,6 +54,9 @@ int main()
             default:
                 break;
         }
+
+        // Then perform actions as desired: 
+
 //      p.bootUp();
 //      p0.enable();
 //      p.restart();
