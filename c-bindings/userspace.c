@@ -18,7 +18,7 @@ int main(){
     printf("Enter a word to be sent via the RPMsg channel: ");
     fgets(temp, 50, stdin);
 
-    PRU_sendMsg(&p1, temp);
+    PRU_sendMsg_string(&p1, temp);
     PRU_showRegs(&p1);
     printf("\nReceived Message: %s\n", PRU_getMsg(&p1));
     PRU_disable(&p1);

@@ -12,11 +12,20 @@ bool sock_connect();
 char* sendcmd(char* cmd);
 bool sock_disconnect();
 
+//enumeration which describes the states of a PRU Core 
 enum State{
     NONE,
     STOPPED,
     RUNNING,
     HALTED
+};
+
+//enumeration which describes which memory access is required
+enum Memory
+{
+    DATA0 = 0,
+    DATA1 = 1,
+    SHARED = 3
 };
 
 struct Socket{
@@ -58,5 +67,10 @@ int PRU_load(PRU* pru, char* fw);
 void PRU_setChannel(PRU* pru);
 int PRU_setChannel(PRU* pru, int port, char* name);
 State PRU_getState(PRU* pru);
-int PRU_sendMsg(PRU* pru, char *message);
+void PRU_sendMsg_string(PRU* pru, char *message);
+void PRU_sendMsg_raw(PRU* pru, char *message);
 char* PRU_getMsg(PRU* pru);
+int PRU_waitForEvent(PRU* pru);
+int PRU_waitForEvent(PRU* pru, int time);
+char* PRU_mem_read(PRU* pru, Memory mem, char* offset);
+char* PRU_mem_write(PRU* pru, Memory mem, char* offset, char* data);
