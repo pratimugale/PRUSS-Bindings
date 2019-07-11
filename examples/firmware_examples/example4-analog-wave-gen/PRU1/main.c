@@ -31,8 +31,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-//This Firmware Code serves to take input on_cycles and off_cycles for a 4-channel PWM.
+//This Firmware Code serves as an example to read and deserialize the data written in the message buffer.
 
 #include <stdint.h>
 #include <stdio.h>
@@ -88,12 +87,12 @@ void main(void)
 	uint16_t src, dst, len;
 	volatile uint8_t *status;
 
-	/* AM335x must enable OCP(Open Core Protocol) master port access in order for the PRU to
+	/* AM335x must enable OCP master port access in order for the PRU to
 	 * read external memories.
 	 */
 	CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
 
-        volatile uint8_t* sram_pointer = (volatile uint8_t *) PRU_SRAM;
+        volatile uint32_t* sram_pointer = (volatile uint32_t *) PRU_SRAM;
         int i = 0;
 
 	/* Clear the status of the PRU-ICSS system event that the ARM will use to 'kick' us */
@@ -117,7 +116,7 @@ void main(void)
 			/* Receive one message*/
 			while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len)==PRU_RPMSG_SUCCESS){
                         
-                            uint8_t x = *(uint8_t *) payload;
+                            uint32_t x = *(uint32_t *) payload;
 
                             *(sram_pointer+i) = x; 
                             i++;

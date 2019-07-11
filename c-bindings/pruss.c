@@ -216,9 +216,24 @@ State PRU_getState(PRU* pru){
     return pru->state;
 }
 
-int PRU_sendMsg(PRU* pru, char *message){
+void PRU_sendMsg_string(PRU* pru, char *message){
     char space[] = " "; 
-    strcpy(command, "SENDMSG ");
+    strcpy(command, "SENDMSG s ");
+    strcat(command, pru->chanName);
+    strcat(command, space);
+    //snprintf(command, sizeof(command), );
+    char tmp[3];
+    sprintf(tmp, "%d", pru->chanPort);
+    strcat(command, tmp);
+    strcat(command, space);
+    strcat(command, message);
+    //printf("DEBUG:%s\n", command);
+    sendcmd(command);
+} 
+
+void PRU_sendMsg_raw(PRU* pru, char *message){
+    char space[] = " "; 
+    strcpy(command, "SENDMSG r ");
     strcat(command, pru->chanName);
     strcat(command, space);
     //snprintf(command, sizeof(command), );
@@ -243,3 +258,80 @@ char* PRU_getMsg(PRU* pru){
     //printf("DEBUG:%s\n", command);
     return sendcmd(command);
 } 
+
+int PRU_waitForEvent(PRU* pru){
+    char space[] = " "; 
+    strcpy(command, "EVENTWAIT ");
+    strcat(command, pru->chanName);
+    strcat(command, space);
+    char tmp[3];
+    sprintf(tmp, "%d", pru->chanPort);
+    strcat(command, tmp);
+    int ret = atoi(sendcmd(command));
+    return ret;
+}
+
+int PRU_waitForEvent(PRU* pru, int time){
+    char space[] = " "; 
+    strcpy(command, "EVENTWAIT ");
+    strcat(command, pru->chanName);
+    strcat(command, space);
+    char tmp[3];
+    sprintf(tmp, "%d", pru->chanPort);
+    strcat(command, tmp);
+    char time_tmp[5];
+    sprintf(time_tmp, "%d", time);
+    int ret = atoi(sendcmd(command));
+    return ret;
+}
+
+char* PRU_mem_read(PRU* pru, Memory mem, char* offset){
+    if (mem == SHARED){
+        strcpy(command, "MEMREAD_S ");
+        strcat(command, offset);
+        return sendcmd(command);
+    }
+    else if(mem == DATA0 || mem == DATA1){
+        char space[] = " "; 
+        strcpy(command, "MEMREAD_D");
+        char tmp[2];
+        sprintf(tmp, "%d", mem);
+        strcat(command, tmp);
+        strcat(command, space);
+        strcat(command, offset);
+        return sendcmd(command);
+    }
+    else{
+        static char tmp[3];
+        sprintf(tmp, "%d", -EINVAL);
+        return tmp;
+    }
+}
+
+char* PRU_mem_write(PRU* pru, Memory mem, char* offset, char* data){
+    if (mem == SHARED){
+        char space[] = " "; 
+        strcpy(command, "MEMWRITE_S ");
+        strcat(command, offset);
+        strcat(command, space);
+        strcat(command, data);
+        return sendcmd(command);
+    }
+    else if(mem == DATA0 || mem == DATA1){
+        char space[] = " "; 
+        strcpy(command, "MEMWRITE_D");
+        char tmp[2];
+        sprintf(tmp, "%d", mem);
+        strcat(command, tmp);
+        strcat(command, space);
+        strcat(command, offset);
+        strcat(command, space);
+        strcat(command, data);
+        return sendcmd(command);
+    }
+    else{
+        static char tmp[3];
+        sprintf(tmp, "%d", -EINVAL);
+        return tmp;
+    }
+}

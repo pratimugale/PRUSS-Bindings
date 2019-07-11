@@ -1,4 +1,15 @@
 --------
+## Usage
+--------
+
+`g++ mem_read_write.cpp ../../../cpp-bindings/pruss.cpp`
+`./a.out`
+
+**NOTE**: 
+1. While reading from memory, the return value is a one-byte integer [0-255]. <br>
+2. While writing to the memory, the value entered must be a hexadecimal in the format - "ab" (which denotes 0xab i.e 171). The return value must be 0 for successful write.
+
+--------
 ## About the PRU Memory Region
 --------
 The PRU-ICSS comprises various distinct addressable regions that are mapped to both a local and global memory map. 
