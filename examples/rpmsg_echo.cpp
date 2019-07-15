@@ -15,7 +15,7 @@ int main()
 	string s;
 	cout << "Enter a message: ";
 	getline(cin, s);
-	p1.sendMsg(s);
+	p1.sendMsg_string(s);
 	cout << "Loopback       : "<< p1.getMsg();
 	p1.disable();
 	p.shutDown();

@@ -22,6 +22,11 @@ $ mkdir bin
 $ ln -s /usr/bin/clpru clpru
 ```
 So now the make files will find the compiler executable in the correct location via the symbolic link.
+
+ *ARM Linux also needs to create a symbolic link to the /usr/bin/ directory in
+ order to use the same Makefile
+(ARM Linux) ln -s /usr/bin/ /usr/share/ti/cgt-pru/bin* - I'm not entirely sure about this but I'll check on a different image and update.
+
 7. Make sure all the modules are loaded.<br>
 ```
 $ sudo modprobe pru_rproc

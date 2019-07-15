@@ -22,20 +22,20 @@ start:                              ; One time setup.
 
         ADD     R3, R3, 1           ; To equalize the pulse count
 
-count_check:
+count_check:                        ; Sends precise number of pulses (steps) to the stepper motor.
         ADD     R4, R4, 1           ; Increment counter
         QBEQ    stop, R4, R3        ; Stop if the total number of pulses have been generated.
         
 sample_start:                       ; 
-        SET     R30, R30.t0         ; GPIO P9_31 ON -> Drives the steps of the stepper motor
+        SET     R30, R30.t0         ; GPIO P9_31 HIGH -> Each low to high signal counts as a step for the motor.
 sample_high:                        ; [Loop consuming 2 PRU cycles per iteration]
         ADD     R0, R0, 0x00000001  ; Increment counter by 1 
         QBNE    sample_high, R0, R1 ; Repeat loop until ON_Cycles 
         NOP
         NOP
-        NOP
-        NOP
-        NOP
+       ; NOP                        ; NOPs can be removed. This will yield a better frequency. The duty cycle of the pulses is not important.
+       ; NOP
+       ; NOP
         CLR     R30, R30.t0         ; GPIO P9_31 OFF
 sample_low:                         ; [Loop consuming 2 PRU cycles per iteration]
         ADD     R0, R0, 0x00000001  ; Increment counter by 1

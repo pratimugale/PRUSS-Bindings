@@ -52,8 +52,11 @@ PRU_DIR=$(wildcard /sys/devices/platform/ocp/4a32600*.pruss-soc-bus/4a300000.pru
 #	@echo start | sudo tee $(PRU_DIR)/state
 
 install: $(GEN_DIR)/$(TARGET).out
-	@echo '-	copying firmware file $(GEN_DIR)/$(TARGET).out to /lib/firmware/am335x-pru$(PRUN)-fw'
-	#@sudo cp $(GEN_DIR)/$(TARGET).out /lib/firmware/am335x-pru$(PRUN)-fw
+	@echo '-	copying firmware file $(GEN_DIR)/$(TARGET).out to $(GEN_DIR)/am335x-pru$(PRUN)-fw'
+	@sudo cp $(GEN_DIR)/$(TARGET).out $(GEN_DIR)/am335x-pru$(PRUN)-fw 
+	@echo '-	copying firmware file $(GEN_DIR)/am335x-pru$(PRUN)-fw to /lib/firmware/'
+	@sudo cp $(GEN_DIR)/am335x-pru$(PRUN)-fw /lib/firmware/
+	@echo '-	The PRU $(PRUN) is now loaded with the firmware and is waiting to be started.'
 
 $(GEN_DIR)/$(TARGET).out: $(GEN_DIR)/$(TARGET).obj
 	@echo 'LD	$^' 
