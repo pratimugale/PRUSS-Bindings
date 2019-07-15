@@ -4,15 +4,11 @@
 using namespace std;
 
 int main(){
-    Driver d = Driver::get();
-    d.setDegrees(140);
-    cout<<d.getDegrees()<<endl;
+    Driver& d = Driver::get();
 
-    d.activate_motor();
-    cout<<"press 1"<<endl;
-    int x;
-    cin>>x;
-    d.activate_motor();
+    d.activate_motor(); // 180 degrees rotate 
+    d.activate_motor(); // 180 degrees rotate 
+    d.activate_motor(); // 180 degrees rotate 
 
     return 0;
 }
