@@ -11,9 +11,8 @@
 # GEN_DIR points to where to put the generated files.
 
 
-#Added by Pratim
-PRUN=1
-TARGET=main
+PRUN=0
+TARGET=hello
 #So that source.sh file can be ignored(increases complexity)
 
 PRU_CGT:=/usr/share/ti/cgt-pru
@@ -41,22 +40,19 @@ endif
 
 PRU_DIR=$(wildcard /sys/devices/platform/ocp/4a32600*.pruss-soc-bus/4a300000.pruss/$(PRU_ADDR).*/remoteproc/remoteproc*)
 
-#all: stop install start
+all: stop install start
 
-#stop:
-#	@echo "-    Stopping PRU $(PRUN)"
-#	@echo stop | sudo tee $(PRU_DIR)/state || echo Cannot stop $(PRUN)
+stop:
+	@echo "-    Stopping PRU $(PRUN)"
+	@echo stop | sudo tee $(PRU_DIR)/state || echo Cannot stop $(PRUN)
 
-#start:
-#	@echo "-    Starting PRU $(PRUN)"
-#	@echo start | sudo tee $(PRU_DIR)/state
+start:
+	@echo "-    Starting PRU $(PRUN)"
+	@echo start | sudo tee $(PRU_DIR)/state
 
 install: $(GEN_DIR)/$(TARGET).out
-	@echo '-	copying firmware file $(GEN_DIR)/$(TARGET).out to $(GEN_DIR)/am335x-pru$(PRUN)-fw'
-	@sudo cp $(GEN_DIR)/$(TARGET).out $(GEN_DIR)/am335x-pru$(PRUN)-fw 
-	@echo '-	copying firmware file $(GEN_DIR)/am335x-pru$(PRUN)-fw to /lib/firmware/'
-	@sudo cp $(GEN_DIR)/am335x-pru$(PRUN)-fw /lib/firmware/
-	@echo '-	The PRU $(PRUN) is now loaded with the firmware and is waiting to be started.'
+	@echo '-	copying firmware file $(GEN_DIR)/$(TARGET).out to /lib/firmware/am335x-pru$(PRUN)-fw'
+	@sudo cp $(GEN_DIR)/$(TARGET).out /lib/firmware/am335x-pru$(PRUN)-fw
 
 $(GEN_DIR)/$(TARGET).out: $(GEN_DIR)/$(TARGET).obj
 	@echo 'LD	$^' 
