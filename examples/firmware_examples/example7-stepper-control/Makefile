@@ -5,7 +5,7 @@ install:
 	@cd ./PRU0/ && make
 	@cd ./PRU0/ && sudo make install
 	@cd ./PRU1/ && make
-	@g++ userspace.cpp ../../../cpp-bindings/pruss.cpp -o userspace.o
+	@g++ user_test.cpp driver_lib.cpp ../../../cpp-bindings/pruss.cpp -o userspace.o
 	@./userspace.o
 
 clean:

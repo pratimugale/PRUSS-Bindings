@@ -8,21 +8,37 @@ Driver& Driver::get(){
 }
 
 Driver::Driver(){
+    // Default microstepping mode = eighth step mode - One rotation is 1600 steps
+    //                              quarter step mode- One rotation is 800  steps
+    //                              half step mode   - One rotation is 400  steps
+    //                              full step mode   - One rotation is 200  steps
+    
+    setStepMode(EIGHT);
+    // Set default direction to clockwise.
 }
 
-void Driver::setDegrees(float degrees){
-    this->degrees = degrees;
-}
-
-float Driver::getDegrees(){
-    return this->degrees;
+void Driver::setStepMode(StepMode stepMode){
+    this->stepMode = stepMode;
+    // Adjust GPIO output here.
 }
 
 bool Driver::getIsMotorBusy(){
     return this->isMotorBusy;
 }
 
-int Driver::activate_motor(){
+void Driver::calculateCycles(float degrees, float rpm){
+    float stepsPerRevolution = (float)this->stepMode;
+    this->noOfPulses = (int)((stepsPerRevolution * degrees)/360.0);
+    float frequency = ((stepsPerRevolution * rpm)/60.0);
+    float multiplier = 1000000.0/frequency; 
+    this->onCycles = (int)(0.5 * 100 * multiplier); 
+    this->totalCycles = (int)(100 * multiplier); 
+}
+
+int Driver::activateMotor(float degrees, float rpm, StepMode stepMode){
+    // Calculate the values beforehand if the motor is already in running state
+    setStepMode(stepMode);
+    calculateCycles(degrees, rpm);
 
     // Wait until the Motor is done with its previous job.
     while(isMotorBusy == true){}
@@ -32,15 +48,16 @@ int Driver::activate_motor(){
 
     // Start PRU p1 which is loaded with the RPMsg firmware - takes input frequency, dc and number of pulses to be generated.
     this->p1.enable();
-    this->p1.sendMsg_raw(to_string(20000));     // Hardcoded on_cycles - Need to change these acc to freq, dc
-    this->p1.sendMsg_raw(to_string(40000));     // Hardcoded off_cycles 
-    this->p1.sendMsg_raw(to_string(800));       // Number of pulses to be sent - 800 pulses = 180 degree in eighth stepping mode.
+    this->p1.sendMsg_raw(to_string(this->onCycles));     // Hardcoded on_cycles - Need to change these acc to freq, dc
+    this->p1.sendMsg_raw(to_string(this->totalCycles));     // Hardcoded total_cycles 
+    this->p1.sendMsg_raw(to_string(this->noOfPulses));       // Number of pulses to be sent - 800 pulses = 180 degree in eighth stepping mode.
 
     // Start PRU p0 which actually sends out the pulses through GPIO P9_31 all three above mentioned values are set.
     this->p0.enable();
 
     this-> isMotorBusy = true;
     // Wait till motor is done rotating.
+    // Here wait on event on RPMsg channel
     usleep(1000000);
     this-> isMotorBusy = false;
     return 0;
