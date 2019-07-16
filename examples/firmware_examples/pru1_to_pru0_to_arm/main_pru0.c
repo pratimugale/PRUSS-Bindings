@@ -42,7 +42,7 @@
 #include <pru_virtqueue.h>
 #include <pru_rpmsg.h>
  
-#include <pru/io.h>
+//#include <pru/io.h>
 #include "resource_table_pru0.h"
 #include "pru_defs.h"
 

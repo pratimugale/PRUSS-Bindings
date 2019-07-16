@@ -1,86 +1,68 @@
-# Copyright (c) 2015, Dimitar Dimitrov
-#   All rights reserved.
-#
-#   Redistribution and use in source and binary forms, with or without
-#   modification, are permitted provided that the following conditions are met:
-#
-#   * Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer.
-#   * Redistributions in binary form must reproduce the above copyright
-#     notice, this list of conditions and the following disclaimer in
-#     the documentation and/or other materials provided with the
-#     distribution.
-#   * Neither the name of the copyright holders nor the names of
-#     contributors may be used to endorse or promote products derived
-#     from this software without specific prior written permission.
-#
-#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-#  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-#  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-#  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-#  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-#  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-#  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-#  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-#  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-#  POSSIBILITY OF SUCH DAMAGE.
+# 
+# Copyright (c) 2016 Zubeen Tolani <ZeekHuge - zeekhuge@gmail.com>
+# Copyright (c) 2017 Texas Instruments - Jason Kridner <jdk@ti.com>
+# 
 
-# Very simple makefile to cross-compile for PRU
+# TARGET must be defined as the file to be compiled without the .c.
+# PRUN must be defined as the PRU number (0 or 1) to compile for.
+
+# PRU_CGT environment variable points to the TI PRU compiler directory.
+# PRU_SUPPORT points to pru-software-support-package.
+# GEN_DIR points to where to put the generated files.
 
 
-# Common flags
-CROSS_COMPILE ?= pru-
-CFLAGS += -g -Os
-CFLAGS += -Wall -Wextra
+PRUN=0
+TARGET=main_pru0
+#So that source.sh file can be ignored(increases complexity)
 
-# Headers needed by the TI rpmsg library.
-CFLAGS += -I../../include -I../../include/am335x
+PRU_CGT:=/usr/share/ti/cgt-pru
+PRU_SUPPORT:=/usr/lib/ti/pru-software-support-package
+GEN_DIR:=/tmp/pru$(PRUN)-gen
 
-# Define this to squeeze code size by removing atexit, exit, constructors
-# and destructors from CRT.
-CFLAGS += -minrt
+LINKER_COMMAND_FILE=AM335x_PRU.cmd
+LIBS=--library=$(PRU_SUPPORT)/lib/rpmsg_lib.lib
+INCLUDE=--include_path=$(PRU_SUPPORT)/include --include_path=$(PRU_SUPPORT)/include/am335x
 
-# Per-PRU core flags. The -mmcu option will select the correct linker
-# script and will predefine mcu-specific macros.
-CFLAGS0 += -mmcu=am335x.pru0
-CFLAGS1 += -mmcu=am335x.pru1
+STACK_SIZE=0x100
+HEAP_SIZE=0x100
 
-# List of source files to compile for each PRU core.
-SRC0 := main_pru0.c ../../lib/src/pru_rpmsg.c ../../lib/src/pru_virtqueue.c 
-SRC1 := main_pru1.c
+CFLAGS=-v3 -O2 --printf_support=minimal --display_error_number --endian=little --hardware_mac=on --obj_directory=$(GEN_DIR) --pp_directory=$(GEN_DIR) --asm_directory=$(GEN_DIR) -ppd -ppa --asm_listing --c_src_interlist # --absolute_listing
 
-# GCC's -MMD does not yield the needed C dependencies when compiling all
-# C source files at once. So manually list headers here.
-HEADERS := $(wildcard *.h) $(wildcard include/*.h include/*/*.h)
+LFLAGS=--reread_libs --warn_sections --stack_size=$(STACK_SIZE) --heap_size=$(HEAP_SIZE) -m $(GEN_DIR)/$(TARGET).map
 
-# Where to output compiled objects
-OUT := gen
+# Lookup PRU by address
+ifeq ($(PRUN),0)
+PRU_ADDR=4a334000
+endif
+ifeq ($(PRUN),1)
+PRU_ADDR=4a338000
+endif
 
-# Final ELF image file names
-ELF0 := $(OUT)/main_pru0_fw.elf
-ELF1 := $(OUT)/main_pru1_fw.elf
+PRU_DIR=$(wildcard /sys/devices/platform/ocp/4a32600*.pruss-soc-bus/4a300000.pruss/$(PRU_ADDR).*/remoteproc/remoteproc*)
 
-# ============================ DO NOT TOUCH BELOW ============================
-all: $(ELF0) $(ELF1)
-	@echo Success: $^
+all: stop install start
 
-%.s : %.elf
-	$(CROSS_COMPILE)objdump -S -d $< > $@
+stop:
+	@echo "-    Stopping PRU $(PRUN)"
+	@echo stop | sudo tee $(PRU_DIR)/state || echo Cannot stop $(PRUN)
 
-$(OUT):
-	mkdir $(OUT)
+start:
+	@echo "-    Starting PRU $(PRUN)"
+	@echo start | sudo tee $(PRU_DIR)/state
 
-$(ELF0): $(SRC0) $(HEADERS) | $(OUT)
-	$(CROSS_COMPILE)gcc $(CFLAGS) $(CFLAGS0) $(SRC0) $(LDFLAGS) -o $@
+install: $(GEN_DIR)/$(TARGET).out
+	@echo '-	copying firmware file $(GEN_DIR)/$(TARGET).out to /lib/firmware/am335x-pru$(PRUN)-fw'
+	@sudo cp $(GEN_DIR)/$(TARGET).out /lib/firmware/am335x-pru$(PRUN)-fw
 
-$(ELF1): $(SRC1) $(HEADERS) | $(OUT)
-	$(CROSS_COMPILE)gcc $(CFLAGS) $(CFLAGS1) $(SRC1) $(LDFLAGS) -o $@
+$(GEN_DIR)/$(TARGET).out: $(GEN_DIR)/$(TARGET).obj
+	@echo 'LD	$^' 
+	@lnkpru -i$(PRU_CGT)/lib -i$(PRU_CGT)/include $(LFLAGS) -o $@ $^ $(LINKER_COMMAND_FILE) --library=libc.a $(LIBS) $^
+
+$(GEN_DIR)/$(TARGET).obj: $(TARGET).c
+	@mkdir -p $(GEN_DIR)
+	@echo 'CC	$<'
+	@clpru --include_path=$(PRU_CGT)/include $(INCLUDE) $(CFLAGS) -D=PRUN=$(PRUN) -fe $@ $<
 
 clean:
-	$(RM) -fr $(ELF0) $(ELF1) $(OUT)
-
-cscope:
-	cscope -bRk
-
-.PHONY: all clean cscope
+	@echo 'CLEAN	.    PRU $(PRUN)'
+	@rm -rf $(GEN_DIR)

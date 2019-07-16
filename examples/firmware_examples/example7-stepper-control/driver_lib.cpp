@@ -30,7 +30,7 @@ void Driver::calculateCycles(float degrees, float rpm){
     float stepsPerRevolution = (float)this->stepMode;
     this->noOfPulses = (int)((stepsPerRevolution * degrees)/360.0);
     float frequency = ((stepsPerRevolution * rpm)/60.0);
-    float multiplier = 1000000.0/frequency; 
+    float multiplier = ((float)MAX_FREQUENCY)/frequency; 
     this->onCycles = (int)(0.5 * 100 * multiplier); 
     this->totalCycles = (int)(100 * multiplier); 
 }
@@ -67,7 +67,7 @@ Driver::~Driver(){
     // Wait till the Motor completes its rotation after the program has ended
     while(isMotorBusy == true){}
 
-    this->p0.disable();
-    this->p1.disable();
-    this->p.shutDown();
+    //this->p0.disable();
+    //this->p1.disable();
+    //this->p.shutDown();
 }

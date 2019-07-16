@@ -7,6 +7,9 @@
 #include <unistd.h>
 #include "../../../cpp-bindings/pruss.h"
 
+#define MAX_FREQUENCY 1000000.0
+#define EXPECTED_MESSAGE "done\n"
+
 using namespace std;
 
 enum Direction{

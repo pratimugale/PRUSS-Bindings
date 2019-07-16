@@ -77,9 +77,9 @@ volatile register uint32_t __R31;
 // RPMSG_BUF_SIZE = 512 bytes; pru_rpmsg_hdr header is of 16 bytes (minus the data[0] part); so maximum message length is of 496 bytes.
 void* payload[RPMSG_BUF_SIZE];
 
-/*
- * main.c
- */
+// To view the status of Host1, mask out the lower 31 bits.
+#define HOST1_MASK              (0x80000000) 
+#define PRU0_PRU1_EVT           (16)
 
 void main(void)
 {
@@ -121,8 +121,28 @@ void main(void)
                             *(sram_pointer+i) = x; 
                             i++;
 
+                            if (i == 3)
+                                break;
                         }
+                       
+                        if (i == 3)
+                            break;
 		}
 	}
-	
+
+        CT_CFG.GPCFG0 = 0x0000;
+        CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
+
+        while (1){
+            if (__R31 & HOST1_MASK){
+                /* Clear interrupt event */
+                CT_INTC.SICR = 16; 
+                /* Delay to ensure the event is cleared in INTC */
+                __delay_cycles(5);
+                
+                char* outgoingMessage = "done\n";
+
+                pru_rpmsg_send(&transport, dst, src, outgoingMessage, strlen(outgoingMessage));
+            }
+        }
 }

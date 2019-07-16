@@ -37,7 +37,7 @@
 #include <stdint.h>
 #include "resource_table_pru1.h"
 
-#include <pru/io.h>
+//#include <pru/io.h>
 
 
 int main(void)
