@@ -137,6 +137,7 @@ void main(void)
                                     __delay_cycles(5);
                 
                                     pru_rpmsg_send(&transport, dst, src, outgoingMessage, strlen(outgoingMessage));
+                                    break;
                                 }
                             }
                         }

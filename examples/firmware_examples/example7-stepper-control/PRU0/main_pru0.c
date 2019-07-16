@@ -36,15 +36,16 @@ void configIntc(void)
 }
 
 void main(void){
+    configIntc();
+
+    PRU0_PRU1_TRIGGER;
+
     start();
     // All Pulses have now been sent
 
     // Configure GPI and GPO as Mode0 - Direct Connect
     CT_CFG.GPCFG0 = 0x0000;
 
-    configIntc();
-
-    PRU0_PRU1_TRIGGER;
 
     __halt();
 }
