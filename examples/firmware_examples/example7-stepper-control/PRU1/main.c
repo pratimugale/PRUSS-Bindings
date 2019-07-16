@@ -94,6 +94,7 @@ void main(void)
 
         volatile uint32_t* sram_pointer = (volatile uint32_t *) PRU_SRAM;
         int i = 0;
+        char* outgoingMessage = "done\n";
 
 	/* Clear the status of the PRU-ICSS system event that the ARM will use to 'kick' us */
 	CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
@@ -111,38 +112,35 @@ void main(void)
 		/* Check bit 31 of register R31 to see if the ARM has kicked us */
 		if (__R31 & HOST_INT) {
 			/* Clear the event status */
-			CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
+		    CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
 
-			/* Receive one message*/
-			while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len)==PRU_RPMSG_SUCCESS){
-                        
-                            uint32_t x = *(uint32_t *) payload;
+	            /* Receive one message*/
+		    while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len)==PRU_RPMSG_SUCCESS){
+                     
+                        uint32_t x = *(uint32_t *) payload;
 
-                            *(sram_pointer+i) = x; 
-                            i++;
+                        *(sram_pointer+i) = x;      // Write to address-offset 'i' in shared memory
+                        i++;                        // Next integer location i.e. address-offset+=4
 
-                            if (i == 3)
-                                break;
+
+                        // After Writing all three raw integers to the PRU SRAM at i=0, 1, 2 offsets,
+                        // check for interrupt from PRU0
+                        if (i == 3){
+                            CT_CFG.GPCFG0 = 0x0000;
+
+                            // Loop until interrupt on Host1 is detected.
+                            while (1){
+                                if (__R31 & HOST1_MASK){
+                                    /* Clear interrupt event */
+                                    CT_INTC.SICR = 16; 
+                                    /* Delay to ensure the event is cleared in INTC */
+                                    __delay_cycles(5);
+                
+                                    pru_rpmsg_send(&transport, dst, src, outgoingMessage, strlen(outgoingMessage));
+                                }
+                            }
                         }
-                       
-                        if (i == 3)
-                            break;
+                    }
 		}
 	}
-
-        CT_CFG.GPCFG0 = 0x0000;
-        CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
-
-        while (1){
-            if (__R31 & HOST1_MASK){
-                /* Clear interrupt event */
-                CT_INTC.SICR = 16; 
-                /* Delay to ensure the event is cleared in INTC */
-                __delay_cycles(5);
-                
-                char* outgoingMessage = "done\n";
-
-                pru_rpmsg_send(&transport, dst, src, outgoingMessage, strlen(outgoingMessage));
-            }
-        }
 }

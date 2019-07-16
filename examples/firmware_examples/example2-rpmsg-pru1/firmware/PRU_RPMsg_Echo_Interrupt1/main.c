@@ -72,7 +72,7 @@ volatile register uint32_t __R31;
 
 uint8_t payload[RPMSG_BUF_SIZE];
 char* outgoingMessage = "done\n";
-
+int a = 5;
 /*
  * main.c
  */
@@ -107,8 +107,10 @@ void main(void)
 			/* Receive all available messages, multiple messages can be sent per kick */
 			while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len) == PRU_RPMSG_SUCCESS) {
 				/* Echo the message back to the same address from which we just received */
-				pru_rpmsg_send(&transport, dst, src, outgoingMessage, strlen(outgoingMessage));
+                            if (a==5)
+                                pru_rpmsg_send(&transport, dst, src, outgoingMessage, strlen(outgoingMessage));
 			}
 		}
 	}
+
 }
