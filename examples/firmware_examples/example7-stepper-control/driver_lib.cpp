@@ -22,7 +22,61 @@ Driver::Driver(){
 
 void Driver::setStepMode(StepMode stepMode){
     this->stepMode = stepMode;
-    // Adjust GPIO output here.
+    
+    char* x;
+    char* y;
+    if (stepMode == FULL){
+        x = (char*)"0";
+        y = (char*)"0";
+    }
+    else if (stepMode == HALF){
+        x = (char*)"0"; 
+        y = (char*)"1";
+    }
+    else if (stepMode == QUARTER){
+        x = (char*)"1";
+        y = (char*)"0";
+    }
+    else if (stepMode == EIGHT){
+        x = (char*)"1";
+        y = (char*)"1";
+    }
+
+    // Set appropriate GPIOs for Microstepping.
+    int fd1, fd2;
+    char buf1[50], buf2[50];
+    snprintf(buf1, sizeof(buf1), "/sys/class/gpio/gpio48/direction");
+    snprintf(buf2, sizeof(buf2), "/sys/class/gpio/gpio49/direction");
+
+    fd1 = open(buf1, O_WRONLY);
+    if (fd1 < 0){
+        perror("gpio/direction");
+    }
+    fd2 = open(buf2, O_WRONLY);
+    if (fd2 < 0){
+        perror("gpio/direction");
+    }
+    
+    write(fd1, "out", 4);
+    write(fd2, "out", 4);
+    
+    snprintf(buf1, sizeof(buf1), "/sys/class/gpio/gpio48/value");
+    snprintf(buf2, sizeof(buf2), "/sys/class/gpio/gpio49/value");
+
+    fd1 = open(buf1, O_WRONLY);
+    if (fd1 < 0){
+        perror("gpio/value");
+    }
+    fd2 = open(buf2, O_WRONLY);
+    if (fd2 < 0){
+        perror("gpio/value");
+    }
+    
+    write(fd1, x, 2);
+    write(fd2, y, 2);
+
+    close(fd1);
+    close(fd2);
 }
 
 StepMode Driver::getStepMode(){
@@ -137,13 +191,8 @@ void Driver::sleep(){
     if (fd < 0){
         perror("gpio/value");
     }
-
-    if (direction == 0){
-        write(fd, "0", 2);
-    }
-    else {
-        write(fd, "1", 2);
-    }
+    
+    write(fd, "0", 2);
 
     close(fd);
 }
@@ -151,6 +200,28 @@ void Driver::sleep(){
 void Driver::wake(){
     this->asleep = false;
     // Set GPIO Value
+    
+    int fd;
+    char buf[50];
+    snprintf(buf, sizeof(buf), "/sys/class/gpio/gpio117/direction");
+
+    fd = open(buf, O_WRONLY);
+    if (fd < 0){
+        perror("gpio/direction");
+    }
+    
+    write(fd, "out", 4);
+    
+    snprintf(buf, sizeof(buf), "/sys/class/gpio/gpio117/value");
+
+    fd = open(buf, O_WRONLY);
+    if (fd < 0){
+        perror("gpio/value");
+    }
+    
+    write(fd, "1", 2);
+
+    close(fd);
 }
 
 bool Driver::isAsleep(){

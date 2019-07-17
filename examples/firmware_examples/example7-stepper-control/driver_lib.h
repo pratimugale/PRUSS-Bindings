@@ -20,7 +20,7 @@ enum Direction{
 };
 
 enum StepMode{
-    SINGLE  = 200,
+    FULL    = 200,
     HALF    = 400,
     QUARTER = 800,
     EIGHT   = 1600
