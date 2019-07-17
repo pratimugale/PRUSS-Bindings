@@ -10,18 +10,59 @@ Driver& Driver::get(){
 }
 
 Driver::Driver(){
-    // Default microstepping mode = eighth step mode - One rotation is 1600 steps
+    // Set default stepmode to:     eighth step mode - One rotation is 1600 steps
     //                              quarter step mode- One rotation is 800  steps
     //                              half step mode   - One rotation is 400  steps
     //                              full step mode   - One rotation is 200  steps
-    
     setStepMode(EIGHT);
+
     // Set default direction to clockwise.
+    setDirection(CLOCKWISE);
 }
 
 void Driver::setStepMode(StepMode stepMode){
     this->stepMode = stepMode;
     // Adjust GPIO output here.
+}
+
+StepMode Driver::getStepMode(){
+    return this->stepMode;
+}
+
+void Driver::setDirection(Direction direction){
+    this->direction = direction;
+
+    // Set GPIO to DIR of driver motor
+    int fd;
+    char buf[50];
+    snprintf(buf, sizeof(buf), "/sys/class/gpio/gpio115/direction");
+
+    fd = open(buf, O_WRONLY);
+    if (fd < 0){
+        perror("gpio/direction");
+    }
+    
+    write(fd, "out", 4);
+    
+    snprintf(buf, sizeof(buf), "/sys/class/gpio/gpio115/value");
+
+    fd = open(buf, O_WRONLY);
+    if (fd < 0){
+        perror("gpio/value");
+    }
+
+    if (direction == 0){
+        write(fd, "0", 2);
+    }
+    else {
+        write(fd, "1", 2);
+    }
+
+    close(fd);
+}
+
+Direction Driver::getDirection(){
+    return this->direction;
 }
 
 bool Driver::getIsMotorBusy(){
@@ -37,9 +78,10 @@ void Driver::calculateCycles(float degrees, float rpm){
     this->totalCycles = (int)(100 * multiplier); 
 }
 
-int Driver::activateMotor(float degrees, float rpm, StepMode stepMode){
+int Driver::activateMotor(float degrees, float rpm, StepMode stepMode, Direction direction){
     // Calculate the values beforehand if the motor is already in running state
     setStepMode(stepMode);
+    setDirection(direction);
     calculateCycles(degrees, rpm);
 
     // Wait until the Motor is done with its previous job.
@@ -50,9 +92,9 @@ int Driver::activateMotor(float degrees, float rpm, StepMode stepMode){
 
     // Start PRU p1 which is loaded with the RPMsg firmware - takes input frequency, dc and number of pulses to be generated.
     this->p1.enable();
-    this->p1.sendMsg_raw(to_string(this->onCycles));     // Hardcoded on_cycles - Need to change these acc to freq, dc
-    this->p1.sendMsg_raw(to_string(this->totalCycles));     // Hardcoded total_cycles 
-    this->p1.sendMsg_raw(to_string(this->noOfPulses));       // Number of pulses to be sent - 800 pulses = 180 degree in eighth stepping mode.
+    this->p1.sendMsg_raw(to_string(this->onCycles));     
+    this->p1.sendMsg_raw(to_string(this->totalCycles));  
+    this->p1.sendMsg_raw(to_string(this->noOfPulses)); 
 
     // Start PRU p0 which actually sends out the pulses through GPIO P9_31 all three above mentioned values are set.
     this->p0.enable();
@@ -60,7 +102,7 @@ int Driver::activateMotor(float degrees, float rpm, StepMode stepMode){
     this-> isMotorBusy = true;
     // Wait till motor is done rotating.
     // Here wait on event on RPMsg channel
-//    usleep(1000000);
+    // usleep(1000000);
     string messageFromPRU;
     while(1){
         messageFromPRU = this->p1.getMsg();
@@ -72,6 +114,47 @@ int Driver::activateMotor(float degrees, float rpm, StepMode stepMode){
     }
     this-> isMotorBusy = false;
     return 0;
+}
+
+void Driver::sleep(){
+    this->asleep = true; 
+    // Set GPIO 
+    
+    int fd;
+    char buf[50];
+    snprintf(buf, sizeof(buf), "/sys/class/gpio/gpio117/direction");
+
+    fd = open(buf, O_WRONLY);
+    if (fd < 0){
+        perror("gpio/direction");
+    }
+    
+    write(fd, "out", 4);
+    
+    snprintf(buf, sizeof(buf), "/sys/class/gpio/gpio117/value");
+
+    fd = open(buf, O_WRONLY);
+    if (fd < 0){
+        perror("gpio/value");
+    }
+
+    if (direction == 0){
+        write(fd, "0", 2);
+    }
+    else {
+        write(fd, "1", 2);
+    }
+
+    close(fd);
+}
+
+void Driver::wake(){
+    this->asleep = false;
+    // Set GPIO Value
+}
+
+bool Driver::isAsleep(){
+    return this->asleep;
 }
 
 Driver::~Driver(){

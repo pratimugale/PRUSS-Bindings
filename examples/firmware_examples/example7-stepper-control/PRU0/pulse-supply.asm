@@ -46,4 +46,4 @@ sample_low:                         ; [Loop consuming 2 PRU cycles per iteration
 stop:
 ;        SET     R31, R31.t30
         SET     R31, R31.t5
-	HALT
+        HALT

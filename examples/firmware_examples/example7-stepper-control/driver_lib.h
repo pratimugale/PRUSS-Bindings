@@ -5,6 +5,8 @@
 #include <string>
 #include <errno.h>
 #include <unistd.h>
+#include <fstream>
+#include <fcntl.h>
 #include "../../../cpp-bindings/pruss.h"
 
 #define MAX_FREQUENCY 1000000.0
@@ -13,8 +15,8 @@
 using namespace std;
 
 enum Direction{
-    CLOCKWISE,
-    ANTICLOCKWISE
+    CLOCKWISE     = 0,
+    ANTICLOCKWISE = 1
 };
 
 enum StepMode{
@@ -39,8 +41,6 @@ class Driver{
     public:
         Driver();
 
-        //void setDegrees(float degrees);
-        //float getDegrees();
         void setStepMode(StepMode stepMode);
         StepMode getStepMode();
         void setDirection(Direction direction);
@@ -48,7 +48,7 @@ class Driver{
         bool getIsMotorBusy();
 
         void calculateCycles(float degrees, float rpm);
-        int activateMotor(float degrees = 360.0, float rpm = 60.0, StepMode stepMode = EIGHT);
+        int activateMotor(float degrees = 360.0, float rpm = 60.0, StepMode stepMode = EIGHT, Direction direction = CLOCKWISE);
         void sleep();
         void wake();
         bool isAsleep();
