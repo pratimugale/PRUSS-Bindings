@@ -30,25 +30,23 @@ void configIntc(void)
 	/* Enable event 16 */
 	CT_INTC.EISR = 16; 
 	/* Enable Host interrupt 1 */
-	CT_INTC.HIEISR |= (1 << 0); 
-        __R31 |= ((uint32_t) 1 << 30);
+	CT_INTC.HIEISR |= (0 << 0); 
+// DON'T DO ->        __R31 |= ((uint32_t) 1 << 30);
 	// Globally enable host interrupts
 	CT_INTC.GER = 1; 
 }
 
 void main(void){
 
-    start();
-    // All Pulses have now been sent
-
-    // Configure GPI and GPO as Mode0 - Direct Connect
-    CT_CFG.GPCFG0 = 0x0000;
-
     configIntc();
 
+    start();
+    // All Pulses have now been sent
+    
     PRU0_PRU1_TRIGGER;
-
-
+    
+    // Configure GPI and GPO as Mode0 - Direct Connect
+    CT_CFG.GPCFG0 = 0x0000;
 
     __halt();
 }

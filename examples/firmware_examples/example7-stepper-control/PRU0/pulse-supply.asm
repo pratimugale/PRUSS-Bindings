@@ -44,4 +44,6 @@ sample_low:                         ; [Loop consuming 2 PRU cycles per iteration
         QBA     count_check         ; One PWM cycle is completed. Repeat again for back to back pulses.
 
 stop:
+;        SET     R31, R31.t30
+        SET     R31, R31.t5
 	HALT

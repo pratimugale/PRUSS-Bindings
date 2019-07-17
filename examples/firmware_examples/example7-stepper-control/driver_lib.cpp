@@ -1,5 +1,7 @@
 #include "driver_lib.h"
 
+#include <iostream>
+
 using namespace std;
 
 Driver& Driver::get(){
@@ -58,7 +60,16 @@ int Driver::activateMotor(float degrees, float rpm, StepMode stepMode){
     this-> isMotorBusy = true;
     // Wait till motor is done rotating.
     // Here wait on event on RPMsg channel
-    usleep(1000000);
+//    usleep(1000000);
+    string messageFromPRU;
+    while(1){
+        messageFromPRU = this->p1.getMsg();
+        if(messageFromPRU.compare(EXPECTED_MESSAGE) == 0){
+            cout<<"Motor Command Successful"<<endl;
+            break;
+        }
+        
+    }
     this-> isMotorBusy = false;
     return 0;
 }
@@ -67,7 +78,7 @@ Driver::~Driver(){
     // Wait till the Motor completes its rotation after the program has ended
     while(isMotorBusy == true){}
 
-    //this->p0.disable();
-    //this->p1.disable();
-    //this->p.shutDown();
+    this->p0.disable();
+    this->p1.disable();
+    this->p.shutDown();
 }

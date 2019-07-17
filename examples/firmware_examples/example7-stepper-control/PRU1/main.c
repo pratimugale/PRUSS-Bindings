@@ -46,8 +46,8 @@ volatile register uint32_t __R31;
 
 #define PRU_SRAM 0x00010000
 
-/* Host-1 Interrupt sets bit 31 in register R31 */
-#define HOST_INT			((uint32_t) 1 << 30)
+// Host-1 Interrupt sets bit 31 in register R31 - Host-1 Interrupt is used for RPMsg 
+#define HOST_INT			((uint32_t) 1 << 31)
 
 /* The PRU-ICSS system events used for RPMsg are defined in the Linux device tree
  * In this example, PRU1 uses system event 18 (To ARM) and 19 (From ARM)
@@ -77,7 +77,7 @@ volatile register uint32_t __R31;
 // RPMSG_BUF_SIZE = 512 bytes; pru_rpmsg_hdr header is of 16 bytes (minus the data[0] part); so maximum message length is of 496 bytes.
 void* payload[RPMSG_BUF_SIZE];
 
-// To view the status of Host0, set the bit 30 to high
+// FOR INTERRUPT FROM PRU0
 #define HOST0_MASK              ((uint32_t) 1 << 30) 
 #define PRU0_PRU1_EVT           (16)
 
