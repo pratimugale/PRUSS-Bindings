@@ -78,8 +78,9 @@ volatile register uint32_t __R31;
 void* payload[RPMSG_BUF_SIZE];
 
 // FOR INTERRUPT FROM PRU0
-#define HOST0_MASK              ((uint32_t) 1 << 30) 
-#define PRU0_PRU1_EVT           (16)
+// Host-0 Interrupt sets bit 30 in register R31 - Host-0 Interrupt is used for interrupt from PRU0
+#define HOST0_MASK              ((uint32_t) 1 << 30)   
+#define PRU0_PRU1_EVT           (16)        // PRU-ICSS System Event 16 for PRU0-PRU1 interrupt.
 
 void main(void)
 {
@@ -87,8 +88,8 @@ void main(void)
 	uint16_t src, dst, len;
 	volatile uint8_t *status;
 
-	/* AM335x must enable OCP master port access in order for the PRU to
-	 * read external memories.
+	/* AM335x must enable OCP(Open Core Protocol) master port access in order for the PRU to
+	 * read external memories. - As RPMsg basically reads that memory.
 	 */
 	CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
 
@@ -114,28 +115,29 @@ void main(void)
 			/* Clear the event status */
 		    CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
 
-	            /* Receive one message*/
+	            // Receive one message at a time
 		    while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len)==PRU_RPMSG_SUCCESS){
                      
-                        uint32_t x = *(uint32_t *) payload;
+                        uint32_t x = *(uint32_t *) payload;  // Type cast void* payload to get the 4 byte raw integer
 
                         *(sram_pointer+i) = x;      // Write to address-offset 'i' in shared memory
                         i++;                        // Next integer location i.e. address-offset+=4
 
 
-                        // After Writing all three raw integers to the PRU SRAM at i=0, 1, 2 offsets,
-                        // check for interrupt from PRU0
+                        // After Writing all three integers to the PRU SRAM at i=0, 1, 2 offsets,
+                        // Check for interrupt from PRU0
                         if (i == 3){
                             CT_CFG.GPCFG0 = 0x0000;
 
-                            // Loop until interrupt on Host1 is detected.
+                            // Loop until interrupt on Host1 is detected i.e. check bit 30 of R31.
                             while (1){
                                 if (__R31 & HOST0_MASK){
-                                    /* Clear interrupt event */
+                                    // Clear interrupt event 
                                     CT_INTC.SICR = 16; 
-                                    /* Delay to ensure the event is cleared in INTC */
+                                    // Delay to ensure the event is cleared in INTC
                                     __delay_cycles(5);
                 
+                                    // Notify the ARM that PRU0 has completed its work of sending pulses.
                                     pru_rpmsg_send(&transport, dst, src, outgoingMessage, strlen(outgoingMessage));
                                     break;
                                 }

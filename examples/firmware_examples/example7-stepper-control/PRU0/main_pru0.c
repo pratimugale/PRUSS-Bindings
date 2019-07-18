@@ -46,7 +46,7 @@ void main(void){
     PRU0_PRU1_TRIGGER;
     
     // Configure GPI and GPO as Mode0 - Direct Connect
-//    CT_CFG.GPCFG0 = 0x0000;
+    //CT_CFG.GPCFG0 = 0x0000;
 
     __halt();
 }

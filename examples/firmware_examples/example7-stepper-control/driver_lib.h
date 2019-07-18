@@ -20,6 +20,7 @@ enum Direction{
 };
 
 enum StepMode{
+    // Microstepping modes and their equivalent "steps per rotation" aka "pulses per rotation" they consume.
     FULL    = 200,
     HALF    = 400,
     QUARTER = 800,

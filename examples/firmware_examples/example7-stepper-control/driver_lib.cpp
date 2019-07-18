@@ -124,16 +124,17 @@ bool Driver::getIsMotorBusy(){
 }
 
 void Driver::calculateCycles(float degrees, float rpm){
+    // Does the calculation to convert input degrees, rpm; into the format that the PRU requires.
     float stepsPerRevolution = (float)this->stepMode;
-    this->noOfPulses = (int)((stepsPerRevolution * degrees)/360.0);
-    float frequency = ((stepsPerRevolution * rpm)/60.0);
+    this->noOfPulses = (int)(stepsPerRevolution*degrees)/360.0;
+    float frequency = (stepsPerRevolution*rpm)/(60.0);
     float multiplier = ((float)MAX_FREQUENCY)/frequency; 
     this->onCycles = (int)(0.5 * 100 * multiplier); 
     this->totalCycles = (int)(100 * multiplier); 
 }
 
 int Driver::activateMotor(float degrees, float rpm, StepMode stepMode, Direction direction){
-    // Calculate the values beforehand if the motor is already in running state
+    // Calculate the values and set all modes beforehand if the motor is already in RUNNING state
     setStepMode(stepMode);
     setDirection(direction);
     calculateCycles(degrees, rpm);
@@ -141,8 +142,8 @@ int Driver::activateMotor(float degrees, float rpm, StepMode stepMode, Direction
     // Wait until the Motor is done with its previous job.
     while(isMotorBusy == true){}
 
-    this->p0.disable();
-    this->p1.disable();
+    this->p0.disable();  // Disable PRU0 until PRU1 writes input values into the PRU SRAM.
+    this->p1.disable();  // Disable PRU1 so that next values are again written into the same location. The complexity of the firmware hence reduces.
 
     // Start PRU p1 which is loaded with the RPMsg firmware - takes input frequency, dc and number of pulses to be generated.
     this->p1.enable();
@@ -150,30 +151,35 @@ int Driver::activateMotor(float degrees, float rpm, StepMode stepMode, Direction
     this->p1.sendMsg_raw(to_string(this->totalCycles));  
     this->p1.sendMsg_raw(to_string(this->noOfPulses)); 
 
-    // Start PRU p0 which actually sends out the pulses through GPIO P9_31 all three above mentioned values are set.
+    // Start PRU p0 which actually sends out the pulses through GPIO P9_31 after all three above mentioned values are set by PRU1.
     this->p0.enable();
 
     this-> isMotorBusy = true;
-    // Wait till motor is done rotating.
-    // Here wait on event on RPMsg channel
+
+    // Wait till motor is done rotating. Not really required, upto the user.
     // usleep(1000000);
+    
+    // Wait for event on RPMsg channel, to ensure that multiple commands aren't sent to the driver/motor simultaneously.
+    // PRU1 sends back "done\n" on RPMsg channel, once PRU0 interrupts it after it is done sending all its pulses.
     string messageFromPRU;
+    int i = 0;
     while(1){
         messageFromPRU = this->p1.getMsg();
         if(messageFromPRU.compare(EXPECTED_MESSAGE) == 0){
-            cout<<"Motor Command Successful"<<endl;
+            i++;
+            cout<<"Motor Command "<<i<<" Completed"<<endl;
             break;
         }
         
     }
-    this-> isMotorBusy = false;
+    this->isMotorBusy = false;
     return 0;
 }
 
 void Driver::sleep(){
     this->asleep = true; 
-    // Set GPIO 
-    
+
+    // Set GPIO Value
     int fd;
     char buf[50];
     snprintf(buf, sizeof(buf), "/sys/class/gpio/gpio117/direction");
@@ -199,8 +205,8 @@ void Driver::sleep(){
 
 void Driver::wake(){
     this->asleep = false;
-    // Set GPIO Value
     
+    // Set appropriate GPIO Value
     int fd;
     char buf[50];
     snprintf(buf, sizeof(buf), "/sys/class/gpio/gpio117/direction");
@@ -232,6 +238,7 @@ Driver::~Driver(){
     // Wait till the Motor completes its rotation after the program has ended
     while(isMotorBusy == true){}
 
+    sleep();
     this->p0.disable();
     this->p1.disable();
     this->p.shutDown();
