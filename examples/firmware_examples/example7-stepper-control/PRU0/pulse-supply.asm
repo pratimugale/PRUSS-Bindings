@@ -1,7 +1,8 @@
 ;* Source written by Pratim Ugale <pratim.ugale@gmail.com>
-;* This example generates precise number of PWM pulse trains to control a stepper motor and is capable of producing frequencies from 1 Hz to 1 MHz
+;* This example is used to control a stepper motor by sending out precise number of pulse trains at required frequency(RPM). 
 ;* The 4 byte ON_Cycles input must be in memory location 0x00010000 - 0x00010003 in little-endian byte order
 ;* The 4 byte Total_Cycles input must be in memory location 0x00010004 - 0x00010007 in little endian byte order
+;* The 4 byte Number of Pulses input must be in memory location 0x00010008 - 0x000100011 in little-endian byte order
 
 	.cdecls "main_pru0.c"
 
@@ -44,4 +45,6 @@ sample_low:                         ; [Loop consuming 2 PRU cycles per iteration
         QBA     count_check         ; One PWM cycle is completed. Repeat again for back to back pulses.
 
 stop:
-	HALT
+;        SET     R31, R31.t30
+        SET     R31, R31.t5         ; Strobe interrupt configured in main_pru0.c by setting bit 5 of R31 to HIGH
+        HALT

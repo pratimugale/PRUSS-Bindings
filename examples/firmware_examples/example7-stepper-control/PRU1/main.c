@@ -46,7 +46,7 @@ volatile register uint32_t __R31;
 
 #define PRU_SRAM 0x00010000
 
-/* Host-1 Interrupt sets bit 31 in register R31 */
+// Host-1 Interrupt sets bit 31 in register R31 - Host-1 Interrupt is used for RPMsg 
 #define HOST_INT			((uint32_t) 1 << 31)
 
 /* The PRU-ICSS system events used for RPMsg are defined in the Linux device tree
@@ -77,9 +77,10 @@ volatile register uint32_t __R31;
 // RPMSG_BUF_SIZE = 512 bytes; pru_rpmsg_hdr header is of 16 bytes (minus the data[0] part); so maximum message length is of 496 bytes.
 void* payload[RPMSG_BUF_SIZE];
 
-/*
- * main.c
- */
+// FOR INTERRUPT FROM PRU0
+// Host-0 Interrupt sets bit 30 in register R31 - Host-0 Interrupt is used for interrupt from PRU0
+#define HOST0_MASK              ((uint32_t) 1 << 30)   
+#define PRU0_PRU1_EVT           (16)        // PRU-ICSS System Event 16 for PRU0-PRU1 interrupt.
 
 void main(void)
 {
@@ -87,13 +88,14 @@ void main(void)
 	uint16_t src, dst, len;
 	volatile uint8_t *status;
 
-	/* AM335x must enable OCP master port access in order for the PRU to
-	 * read external memories.
+	/* AM335x must enable OCP(Open Core Protocol) master port access in order for the PRU to
+	 * read external memories. - As RPMsg basically reads that memory.
 	 */
 	CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
 
         volatile uint32_t* sram_pointer = (volatile uint32_t *) PRU_SRAM;
         int i = 0;
+        char* outgoingMessage = "done\n";
 
 	/* Clear the status of the PRU-ICSS system event that the ARM will use to 'kick' us */
 	CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
@@ -111,18 +113,37 @@ void main(void)
 		/* Check bit 31 of register R31 to see if the ARM has kicked us */
 		if (__R31 & HOST_INT) {
 			/* Clear the event status */
-			CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
+		    CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
 
-			/* Receive one message*/
-			while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len)==PRU_RPMSG_SUCCESS){
-                        
-                            uint32_t x = *(uint32_t *) payload;
+	            // Receive one message at a time
+		    while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len)==PRU_RPMSG_SUCCESS){
+                     
+                        uint32_t x = *(uint32_t *) payload;  // Type cast void* payload to get the 4 byte raw integer
 
-                            *(sram_pointer+i) = x; 
-                            i++;
+                        *(sram_pointer+i) = x;      // Write to address-offset 'i' in shared memory
+                        i++;                        // Next integer location i.e. address-offset+=4
 
+
+                        // After Writing all three integers to the PRU SRAM at i=0, 1, 2 offsets,
+                        // Check for interrupt from PRU0
+                        if (i == 3){
+                            CT_CFG.GPCFG0 = 0x0000;
+
+                            // Loop until interrupt on Host1 is detected i.e. check bit 30 of R31.
+                            while (1){
+                                if (__R31 & HOST0_MASK){
+                                    // Clear interrupt event 
+                                    CT_INTC.SICR = 16; 
+                                    // Delay to ensure the event is cleared in INTC
+                                    __delay_cycles(5);
+                
+                                    // Notify the ARM that PRU0 has completed its work of sending pulses.
+                                    pru_rpmsg_send(&transport, dst, src, outgoingMessage, strlen(outgoingMessage));
+                                    break;
+                                }
+                            }
                         }
+                    }
 		}
 	}
-	
 }
