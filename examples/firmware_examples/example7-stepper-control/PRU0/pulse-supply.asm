@@ -11,27 +11,28 @@ PRU_SRAM .set 0x00010000            ; Set the location of PRU Shared Memory
 	.clink
 	.global start
 start:                              ; One time setup.
-        LDI32   R10, PRU_SRAM       ; R10 -> Base address of PRU SRAM
-        SUB     R1, R1, R1          ; Clear the contents of R1
-        SUB     R2, R2, R2          ; Clear the contents of R2
-        LBBO    &R1, R10, 0, 4      ; R1 -> Duty Cycle.(actually ON cycles); Copy (4) bytes into R1 from memory address R10+offset(0)
-        LBBO    &R2, R10, 4, 4      ; R2 -> Total Cycles. Copy (4) bytes into R2 from memory address R10+offset(4)
-        LBBO    &R3, R10, 8, 4      ; R3 -> Number of pulses to be generated. Copy (4) bytes into R3 from memory address R10+offset(8)
-        LDI     R0, 0               ; R0 -> Total sample count (goes from 0 to 100 for 1MHz)
-        LDI     R4, 0               ; R4 -> Counts the number of pulses to be generated.
+        LDI32   R9, PRU_SRAM        ; R9 -> Base address of PRU SRAM
+        SUB     R6, R6, R6          ; Clear the contents of R6
+        SUB     R7, R7, R7          ; Clear the contents of R7
+        SUB     R8, R8, R8          ; Clear the contents of R7
+        LBBO    &R6, R9, 0, 4       ; R6 -> Duty Cycle.(actually ON cycles); Copy (4) bytes into R6 from memory address R9+offset(0)
+        LBBO    &R7, R9, 4, 4       ; R7 -> Total Cycles. Copy (4) bytes into R7 from memory address R9+offset(4)
+        LBBO    &R8, R9, 8, 4       ; R8 -> Number of pulses to be generated. Copy (4) bytes into R8 from memory address R9+offset(8)
+        LDI     R11, 0              ; R11 -> Total sample count (goes from 0 to 100 for 1MHz)
+        LDI     R10, 0              ; R10 -> Counts the number of pulses to be generated.
         QBA     sample_start
 
-        ADD     R3, R3, 1           ; To equalize the pulse count
+        ADD     R8, R8, 1           ; To equalize the pulse count
 
 count_check:                        ; Sends precise number of pulses (steps) to the stepper motor.
-        ADD     R4, R4, 1           ; Increment counter
-        QBEQ    stop, R4, R3        ; Stop if the total number of pulses have been generated.
+        ADD     R10, R10, 1           ; Increment counter
+        QBEQ    stop, R10, R8        ; Stop if the total number of pulses have been generated.
         
 sample_start:                       ; 
         SET     R30, R30.t0         ; GPIO P9_31 HIGH -> Each low to high signal counts as a step for the motor.
 sample_high:                        ; [Loop consuming 2 PRU cycles per iteration]
-        ADD     R0, R0, 0x00000001  ; Increment counter by 1 
-        QBNE    sample_high, R0, R1 ; Repeat loop until ON_Cycles 
+        ADD     R11, R11, 0x00000001 ; Increment counter by 1 
+        QBNE    sample_high, R11, R6 ; Repeat loop until ON_Cycles 
         NOP
         NOP
        ; NOP                        ; NOPs can be removed. This will yield a better frequency. The duty cycle of the pulses is not important.
@@ -39,12 +40,12 @@ sample_high:                        ; [Loop consuming 2 PRU cycles per iteration
        ; NOP
         CLR     R30, R30.t0         ; GPIO P9_31 OFF
 sample_low:                         ; [Loop consuming 2 PRU cycles per iteration]
-        ADD     R0, R0, 0x00000001  ; Increment counter by 1
-        QBNE    sample_low, R0, R2  ; Repeat loop until Total Cycles
-        SUB     R0, R0, R0          ; Clear the counter register
+        ADD     R11, R11, 0x00000001  ; Increment counter by 1
+        QBNE    sample_low, R11, R7 ; Repeat loop until Total Cycles
+        SUB     R11, R11, R11       ; Clear the counter register
         QBA     count_check         ; One PWM cycle is completed. Repeat again for back to back pulses.
 
 stop:
 ;        SET     R31, R31.t30
-        SET     R31, R31.t5         ; Strobe interrupt configured in main_pru0.c by setting bit 5 of R31 to HIGH
-        HALT
+        ;SET     R31, R31.t5         ; Strobe interrupt configured in main_pru0.c by setting bit 5 of R31 to HIGH
+        JMP      R3.w2               ; R3.w2->contains return address; jumps back to the execution of c-code from which this .asm code was called

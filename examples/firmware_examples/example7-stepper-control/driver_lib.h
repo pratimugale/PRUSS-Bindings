@@ -61,6 +61,7 @@ class Driver{
         ~Driver();
 
         static Driver& get();
+        static int i; // gets 0 initialized
 };
 
 #endif

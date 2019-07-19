@@ -9,6 +9,8 @@ Driver& Driver::get(){
     return driver;
 }
 
+int Driver::i = 0;
+
 Driver::Driver(){
     // Set default stepmode to:     eighth step mode - One rotation is 1600 steps
     //                              quarter step mode- One rotation is 800  steps
@@ -18,6 +20,8 @@ Driver::Driver(){
 
     // Set default direction to clockwise.
     setDirection(CLOCKWISE);
+
+    // Command counter
 }
 
 void Driver::setStepMode(StepMode stepMode){
@@ -162,12 +166,11 @@ int Driver::activateMotor(float degrees, float rpm, StepMode stepMode, Direction
     // Wait for event on RPMsg channel, to ensure that multiple commands aren't sent to the driver/motor simultaneously.
     // PRU1 sends back "done\n" on RPMsg channel, once PRU0 interrupts it after it is done sending all its pulses.
     string messageFromPRU;
-    int i = 0;
     while(1){
         messageFromPRU = this->p1.getMsg();
         if(messageFromPRU.compare(EXPECTED_MESSAGE) == 0){
-            i++;
-            cout<<"Motor Command "<<i<<" Completed"<<endl;
+            Driver::i++;
+            cout<<"Motor Command "<<Driver::i<<" Completed"<<endl;
             break;
         }
         
