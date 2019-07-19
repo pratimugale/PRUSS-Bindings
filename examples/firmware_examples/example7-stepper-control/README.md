@@ -1,5 +1,8 @@
 # Stepper Motor Control
 
+Video of working: [https://www.youtube.com/watch?v=joPQ1JjVkvU](https://www.youtube.com/watch?v=joPQ1JjVkvU)
+Will add a demonstration video soon.
+
 ## Hardware Used
 
 1. Motor: [NEMA 17 Motor]()
