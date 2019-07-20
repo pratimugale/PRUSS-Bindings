@@ -9,26 +9,62 @@ PRU_SRAM .set 0x00010000            ; Set the location of PRU Shared Memory
 	.global start
 start:                              ; One time setup.
         LDI32   R10, PRU_SRAM       ; R10 -> Base address of PRU SRAM
-        SUB     R1, R1, R1          ; Clear the contents of R1
-        SUB     R2, R2, R2          ; Clear the contents of R2
-        LBBO    &R1, R10, 0, 4      ; R1 -> Duty Cycle.(actually ON cycles); Copy (4) bytes into R1 from memory address R10+offset(0)
-        LBBO    &R2, R10, 4, 4      ; R2 -> Total Cycles. Copy (4) bytes into R2 from memory address R10+offset(5)
-        LDI     R0, 0               ; R0 - Total sample count (goes from 0 to 100 for 1MHz)
+        SUB     R6, R6, R6          ; Clear the contents of R6
+        SUB     R7, R7, R7          ; Clear the contents of R7
+        LBBO    &R6.b0, R10, 0, 1      ; R6 -> Time delay; Copy (1) bytes into R6 from memory address R10+offset(0)
+        LBBO    &R7.b0, R10, 1, 1      ; R7 -> Number of samples of the wave; Copy (1) bytes into R7 from memory address R10+offset(1)
+        LDI     R11, 0              ; R11-> To keep a count of the samples being done.
+      ; LBBO    &R8, R10, 2, 1      ; R8 -> Number of samples of the wave; Copy (1) bytes into R8 from memory address R10+offset(2)
+        LDI     R12, 1              ; R12-> Keeps track of the memory location offsets
+        
+        ADD     R7.b0, R7.b0, 2
+    
         QBA     sample_start
 
 sample_start:                       ; 
-        SET     R30, R30.t0         ; GPIO P9_31 ON
-sample_high:                        ; [Loop consuming 2 PRU cycles per iteration]
-        ADD     R0, R0, 0x00000001  ; Increment counter by 1 
-        QBNE    sample_high, R0, R1 ; Repeat loop until ON_Cycles 
-        NOP
-        NOP
-        NOP
-        CLR     R30, R30.t0         ; GPIO P9_31 OFF
-sample_low:                         ; [Loop consuming 2 PRU cycles per iteration]
-        ADD     R0, R0, 0x00000001  ; Increment counter by 1
-        QBNE    sample_low, R0, R2  ; Repeat loop until Total Cycles
-        SUB     R0, R0, R0          ; Clear the counter register
-        QBA     sample_start        ; One PWM cycle is completed. Repeat again for back to back pulses.
+        QBLT    same_sample, R11.b0, R7.b0          ;
+        ;QBLT    same_sample, R12, R7          ;
+        LDI     R12, 1              ; Reset for next sample 
 
+same_sample:                        ; [Loop consuming 2 PRU cycles per iteration]
+        ADD     R12, R12, 1         ; Increment offset counter by 1 
+        LBBO    &R13.b0, R10, R12.b0, 1   ; Repeat loop until ON_Cycles 
+        QBLT    greaterthan_zero, R13.b0, 1  ; Repeat loop until ON_Cycles 
+        LDI     R13.b0, 1
+
+greaterthan_zero:                         ; [Loop consuming 2 PRU cycles per iteration]
+        QBGT    corrected_values, R13.b0, 100  ; Repeat loop until ON_Cycles 
+        LDI     R13.b0, 99
+
+corrected_values:
+        LDI32     R14, 200            ; Total  cycles for 1MHz pwm frequency
+        LDI32     R15, 5000          ; Number of pulses
+        LDI32     R16, 0              ; Pulse Counter
+        LDI32     R17, 0
+
+count_check:
+        ADD     R16, R16, 1
+        QBEQ    done_sample, R16, R15        ; Stop if the total number of pulses have been generated.
+
+start_pwm: 
+        SET     R30, R30.t0
+
+pwm_high:
+        ADD     R17, R17, 0x00000001
+        QBNE    pwm_high, R17.b0, R13.b0
+        NOP
+        NOP
+        CLR     R30, R30.t0
+pwm_low:
+        ADD     R17, R17, 0x00000001
+        QBNE    pwm_low, R17, R14
+        SUB     R17, R17, R17
+        QBA count_check
+
+done_sample
+        ADD     R11.b0, R11.b0, 1 
+        ;QBBS    stop, R31.t0
+        QBA     sample_start
+
+stop: 
 	HALT

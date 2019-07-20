@@ -15,6 +15,17 @@ int main()
         // Choose which memory access is needed - read the enum from pruss.h
         Memory mem = SHARED;
 
+        // Start
+        
+        char off[4];
+        for(int i = 0; i < 100; i++){
+            sprintf(off, "%i", i); 
+            cout<<p0.mem_read(mem, off)<<endl;
+        }
+
+
+        // END
+
         cout<<"Choose Base Location:"<<endl;
         cout<<"1: DRAM0; 2: DRAM1; 3: SRAM"<<endl;
 
