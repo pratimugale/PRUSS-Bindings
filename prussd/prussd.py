@@ -216,7 +216,7 @@ def event_wait(cmd):
 
 def mem_read(ram, cmd):
     try:
-        addr_offset = int(cmd[1], 16)
+        addr_offset = int(cmd[1], 10)
     except ValueError:
         return -errno.EINVAL
 
@@ -238,7 +238,7 @@ def mem_read(ram, cmd):
 
 def mem_write():
     try:
-        addr_offset = int(cmd[1], 16)
+        addr_offset = int(cmd[1], 10)
         data = int(cmd[2], 16)
     except ValueError:
         return -errno.EINVAL
