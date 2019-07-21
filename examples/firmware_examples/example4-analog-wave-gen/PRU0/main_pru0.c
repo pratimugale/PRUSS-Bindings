@@ -20,7 +20,7 @@ void main(void){
     float freq = 2.0f * 3.14159f / 100.0f;
     
     for (i = 0; i < 100; i++){
-        waveform[i] = (uint8_t)(bias + (gain * tan((i*freq) + phase)));
+        waveform[i] = (uint8_t)(bias + (gain * sin((i*freq) + phase)));
         //waveform[i] = i;
     }
     
