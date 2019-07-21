@@ -1,5 +1,6 @@
 #include "../../../cpp-bindings/pruss.h"
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -13,7 +14,7 @@ int main()
         string data;
 
         // Choose which memory access is needed - read the enum from pruss.h
-        Memory mem = SHARED;
+        Memory mem = DATA0;
 
         // Start
         

@@ -1,19 +1,19 @@
 ;* Source written by Pratim Ugale <pratim.ugale@gmail.com>
-;* This example generates uses PWM to generate analog signal defined by the user(by writing data into the PRU SRAM)
+;* This example generates uses PWM to generate analog signal defined by the user(by writing data into the PRU DRAM0)
 
 	.cdecls "main_pru0.c"
 
-PRU_SRAM .set 0x00010000            ; Set the location of PRU Shared Memory
+PRU_DRAM0 .set 0x00000000            ; Set the location of PRU0 Data Memory 
 
 	.clink
 	.global start
 start:                              ; One time setup.
-        LDI32   R10, PRU_SRAM       ; R10 -> Base address of PRU SRAM
+        LDI32   R10, PRU_DRAM0       ; R10 -> Base address of PRU DRAM0
         SUB     R6, R6, R6          ; Clear the contents of R6
         SUB     R7, R7, R7          ; Clear the contents of R7
         LBBO    &R6.b0, R10, 0, 1      ; R6 -> Time delay; Copy (1) bytes into R6 from memory address R10+offset(0)
         LBBO    &R7.b0, R10, 1, 1      ; R7 -> Number of samples of the wave; Copy (1) bytes into R7 from memory address R10+offset(1)
-        LDI     R11, 0              ; R11-> To keep a count of the samples being done.
+        LDI     R11, 1              ; R11-> To keep a count of the samples being done.
       ; LBBO    &R8, R10, 2, 1      ; R8 -> Number of samples of the wave; Copy (1) bytes into R8 from memory address R10+offset(2)
         LDI     R12, 1              ; R12-> Keeps track of the memory location offsets
         
@@ -22,8 +22,9 @@ start:                              ; One time setup.
         QBA     sample_start
 
 sample_start:                       ; 
-        QBLT    same_sample, R11.b0, R7.b0          ;
+        QBLT    same_sample, R7.b0, R11.b0          ;
         ;QBLT    same_sample, R12, R7          ;
+        LDI     R11, 1              ; Reset for next sample 
         LDI     R12, 1              ; Reset for next sample 
 
 same_sample:                        ; [Loop consuming 2 PRU cycles per iteration]
@@ -37,10 +38,10 @@ greaterthan_zero:                         ; [Loop consuming 2 PRU cycles per ite
         LDI     R13.b0, 99
 
 corrected_values:
-        LDI32     R14, 200            ; Total  cycles for 1MHz pwm frequency
-        LDI32     R15, 5000          ; Number of pulses
+        LDI32     R14, 100            ; Total  cycles for 1MHz pwm frequency
+        LDI32     R15, 10000          ; Number of pulses
         LDI32     R16, 0              ; Pulse Counter
-        LDI32     R17, 0
+        LDI32     R17, 0 
 
 count_check:
         ADD     R16, R16, 1

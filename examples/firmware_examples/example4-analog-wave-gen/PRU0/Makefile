@@ -33,7 +33,7 @@ STACK_SIZE=0x100
 HEAP_SIZE=0x100
 
 
-CFLAGS=-v3 -O2 --printf_support=minimal --display_error_number --endian=little --hardware_mac=on --obj_directory=$(GEN_DIR) --pp_directory=$(GEN_DIR) --asm_directory=$(GEN_DIR) -ppd -ppa --asm_listing --c_src_interlist # --absolute_listing
+CFLAGS=-v3 -O2 --printf_support=minimal --display_error_number --endian=little --hardware_mac=on --obj_directory=$(GEN_DIR) --pp_directory=$(GEN_DIR) --asm_directory=$(GEN_DIR) -ppd -ppa --asm_listing --optimizer_interlist --c_src_interlist # --absolute_listing
 LFLAGS=--reread_libs --warn_sections --stack_size=$(STACK_SIZE) --heap_size=$(HEAP_SIZE) -m $(GEN_DIR)/$(TARGET).map
 
 
@@ -52,11 +52,11 @@ TARGETS		=$(PRU0_FW)
 # add the required files while linkin the FW code
 # required linking files for PRU1
 # LINK_PRU1_FW = (GEN_DIR)/pru1-inline-asm.object (GEN_DIR)/code2_pru1.object
-# LINK_PRU1_FW= $(GEN_DIR)/pru-asm-pwm.object
+# LINK_PRU1_FW= $(GEN_DIR)/pulse-supply.object
 
 # required linking files for PRU1
 # LINK_PRU0_FW = (GEN_DIR)/pru0-inline-asm.object (GEN_DIR)/code2_pru1.object
-LINK_PRU0_FW= $(GEN_DIR)/pru-asm-pwm.object
+LINK_PRU0_FW= $(GEN_DIR)/pulse-supply.object
 
 #------------------------------------------------------
 
@@ -89,41 +89,30 @@ $(GEN_DIR)/main_pru1.object: main_pru1.c
 	@$(PRU_CGT)/bin/clpru --include_path=$(PRU_CGT)/include $(INCLUDE) $(CFLAGS) -fe $@ $<
 
 
-$(GEN_DIR)/pru-asm-pwm.object: pru-asm-pwm.asm
+$(GEN_DIR)/pulse-supply.object: pulse-supply.asm
 	@mkdir -p $(GEN_DIR)
 	@echo 'CC	$<'
 	@$(PRU_CGT)/bin/clpru --include_path=$(PRU_CGT)/include $(INCLUDE) $(CFLAGS) -fe $@ $<
 
 
 
-.PHONY: install install-pru1 install-pru0 copy_pru0_fw copy_pru1_fw reboot_pru_1 reboot_pru_0
+.PHONY: install install-pru1 install-pru0 copy_pru0_fw copy_pru1_fw 
 
 install: $(patsubst $(GEN_DIR)/main_pru%_fw.out, install-pru%, $(TARGETS))
 
 
-install-pru1: $(PRU1_FW) copy_pru1_fw reboot_pru1
-install-pru0: $(PRU0_FW) copy_pru0_fw reboot_pru0
+install-pru1: $(PRU1_FW) copy_pru1_fw 
+install-pru0: $(PRU0_FW) copy_pru0_fw 
 
 copy_pru1_fw:
 	@echo '-	copying firmware to /lib/firmware/am335x_pru1_fw'
 	@cp $(PRU1_FW) /lib/firmware/am335x-pru1-fw
 
 copy_pru0_fw: $(PRU0_FW)
-	@echo '-	copying firmware to /lib/firmware/am335x_pru0_fw'
-	@cp $(PRU0_FW) /lib/firmware/am335x-pru0-fw
-
-reboot_pru1:
-	@echo '-	rebooting pru core 1'
-	$(shell echo "4a338000.pru1" > /sys/bus/platform/drivers/pru-rproc/unbind 2> /dev/null)
-	$(shell echo "4a338000.pru1" > /sys/bus/platform/drivers/pru-rproc/bind)
-	@echo "-	pru core 1 is now loaded with $(PRU1_FW)"
-
-reboot_pru0:
-	@echo '-	rebooting pru core 0'
-	$(shell echo "4a334000.pru0" > /sys/bus/platform/drivers/pru-rproc/unbind 2> /dev/null)
-	$(shell echo "4a334000.pru0" > /sys/bus/platform/drivers/pru-rproc/bind)
-	@echo "-	pru core 0 is now loaded with $(PRU0_FW)"
-
+	@echo '-	copying firmware to /am335x_pru0_fw'
+	@cp $(PRU0_FW) am335x-pru0-fw
+	@echo '-	copying firmware to /lib/firmware/'
+	@cp am335x-pru0-fw /lib/firmware
 
 .PHONY: clean
 clean:
