@@ -116,10 +116,18 @@ void main(void)
 			/* Receive one message*/
 			while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len)==PRU_RPMSG_SUCCESS){
                         
-                            uint32_t x = *(uint32_t *) payload;
+                            //uint32_t x = *(uint32_t *) payload;
+                            //uint32_t x[2];
+                            //x = (uint32_t[2])(uint32_t (*)[2]payload);
+                            //x = payload;
+                            
+                            //*(sram_pointer) = x;
 
-                            *(sram_pointer+i) = x; 
-                            i++;
+                            
+                            for(i = 0; i < 2; i++){
+                                *(sram_pointer+i) = (uint32_t)(uint32_t (*)[2])payload; 
+                            }
+                            //i++;
 
                         }
 		}

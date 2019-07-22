@@ -19,7 +19,10 @@ int main()
         // Start
         
         char off[4];
-        for(int i = 0; i < 100; i++){
+        for(int i = 0; i < 205; i++){
+            if (i == 102){
+                cout<<"donr --------------------------------";
+            }
             sprintf(off, "%i", i); 
             cout<<p0.mem_read(mem, off)<<endl;
         }
