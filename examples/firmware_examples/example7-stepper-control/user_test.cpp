@@ -1,5 +1,6 @@
 #include "driver_lib.h"
 #include <iostream>
+#include <time.h>
 
 using namespace std;
 
@@ -21,12 +22,12 @@ int main(){
     d.wake();
     d.activateMotor(180.0, 150.0, EIGHT, ANTICLOCKWISE); 
     d.activateMotor(180.0, 150.0, EIGHT, CLOCKWISE); 
+    d.activateMotor(270.0, 150.0, EIGHT, ANTICLOCKWISE); 
+    d.activateMotor(270.0, 150.0, EIGHT, CLOCKWISE); 
     d.activateMotor(180.0, 150.0, EIGHT, ANTICLOCKWISE); 
     d.activateMotor(180.0, 150.0, EIGHT, CLOCKWISE); 
-    d.activateMotor(180.0, 150.0, EIGHT, ANTICLOCKWISE); 
-    d.activateMotor(180.0, 150.0, EIGHT, CLOCKWISE); 
-    d.activateMotor(180.0, 150.0, EIGHT, ANTICLOCKWISE); 
-    d.activateMotor(180.0, 150.0, EIGHT, CLOCKWISE); 
+    d.activateMotor(270.0, 150.0, EIGHT, ANTICLOCKWISE); 
+    d.activateMotor(270.0, 150.0, EIGHT, CLOCKWISE); 
     d.sleep();
     usleep(5000000);
     d.wake();

@@ -15,10 +15,8 @@ userspace:
 	@echo 'Compiling the UserSpace Program'
 	@g++ user_test.cpp driver_lib.cpp ../../../cpp-bindings/pruss.cpp -o userspace.o
 	@echo '------------------------------------------------------------------------- '
-	@echo 'Running the UserSpace Program'
 	@./userspace.o
-	@echo '------------------------------------------------------------------------- '
-	@echo 'Execution Complete'
+	@echo 'Started Running'
 
 clean:
 	@cd ./PRU0/ && make clean

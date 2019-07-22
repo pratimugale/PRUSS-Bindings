@@ -170,7 +170,7 @@ int Driver::activateMotor(float degrees, float rpm, StepMode stepMode, Direction
         messageFromPRU = this->p1.getMsg();
         if(messageFromPRU.compare(EXPECTED_MESSAGE) == 0){
             Driver::i++;
-            cout<<"Motor Command "<<Driver::i<<" Completed"<<endl;
+            cout<<"Message "<<Driver::i<<" Received from PRU for Motor command Completion"<<endl;
             break;
         }
         
