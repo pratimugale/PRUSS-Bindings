@@ -92,7 +92,7 @@ void main(void)
 	 */
 	CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
 
-        volatile uint16_t* sram_pointer = (volatile uint16_t *) PRU_SRAM;
+        volatile uint8_t* sram_pointer = (volatile uint8_t *) PRU_SRAM;
         int i = 0;
 
 	/* Clear the status of the PRU-ICSS system event that the ARM will use to 'kick' us */
@@ -116,10 +116,10 @@ void main(void)
 			/* Receive one message*/
 			while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len)==PRU_RPMSG_SUCCESS){
                         
-                            uint16_t x = *(uint16_t *) payload;
+                            uint8_t x = *(uint8_t *) payload;
 
                             //*(sram_pointer+i) = x; 
-                            *(sram_pointer+i) = i; 
+                            *(sram_pointer+i) = x; 
                             i++;
 
                         }

@@ -3,17 +3,21 @@
 #include <math.h>
 #include "resource_table_empty.h"
 
-#define PRU_DATA0 0x00000000
+#define PRU_DATA0 0x00010000
 #define PI 3.14159
 
 extern void start(void);
-volatile uint8_t* data0_pointer = (volatile uint8_t *)PRU_DATA0;
+volatile uint16_t* sram_pointer = (volatile uint16_t *)PRU_DATA0;
 
 void main(void){
 
+    //*(sram_pointer) = (uint16_t) 2000;
+
+    start();
+
     // Generate sine values in an array     
     
-    uint8_t i;
+ /*   uint8_t i;
     uint8_t waveform1[100]; 
     uint8_t waveform2[100]; 
     float gain = 50.0f;
@@ -33,8 +37,8 @@ void main(void){
     }
     
     // ** DELAY FACTOR HAS YET NOT BEEN IMPLEMENTED IN THE ASSEMBLY PROGRAM.
-    uint8_t samplestep = 1;    //delay factor
-    //*(data0_pointer) = samplestep;
+//    uint8_t samplestep = 1;    //delay factor
+    /(data0_pointer) = samplestep;
 
     uint8_t numbersamples = 100;
     *(data0_pointer) = numbersamples;
@@ -44,7 +48,7 @@ void main(void){
         __delay_cycles(10000);
     }
 
-    //*(data0_pointer + 2) = samplestep;
+    *(data0_pointer + 2) = samplestep;
 
     *(data0_pointer + 1) = (uint8_t)numbersamples;
 
@@ -52,6 +56,5 @@ void main(void){
         *(data0_pointer + 103 + i) = waveform2[i];
         __delay_cycles(10000);
     }
-
-    start();
+*/
 }

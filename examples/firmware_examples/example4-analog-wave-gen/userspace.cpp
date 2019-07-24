@@ -12,7 +12,7 @@ int main()
 
 
     uint8_t i;
-    uint8_t waveform[100]; 
+    uint8_t waveform[102]; 
     float gain = 50.0f;
     float phase = 0.0f;
     float bias = 50.0f;
