@@ -24,10 +24,11 @@ int main()
     float freq = 2.0f * (float)PI / 100.0f;
     
     for (i = 0; i < 100; i++){
-        waveform1[i] = (uint8_t)(bias + (gain * sin((i*freq) + phase1)));
+        waveform1[i] = (uint8_t)((bias + (gain * sin((i*freq) + phase1))));
     }
     for (i = 0; i < 100; i++){
-        waveform2[i] = (uint8_t)(bias + (gain * sin((i*freq) + phase2)));
+        waveform2[i] = i;
+       // waveform2[i] = (uint8_t)((bias + (gain * sin((i*freq) + phase2))));
     }
 
     

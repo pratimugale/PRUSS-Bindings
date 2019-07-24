@@ -1,5 +1,11 @@
-# Analog Wave Generator
+# Multi-Channel Waveform Generator.
 
-The PWM code can be modified to generate analog-like waveforms by altering the PWM duty-cycle rapidly over time. This is because the PWM frequency can be very fast due to the 200 MHz PRU. The code will output any periodic waveform that is passed to it, with a maximum periodic sample length of about 12KB(PRU SRAM) in this example. The program can be stopped by echoing stop in the appropriate sysfs entry(I'm not using a button interrupt to stop the execution). 
+## Current Progress: 2-channel
 
-The more the values entered by the user, the more accurate the output signal will be.
+Output Videos:
+1. [https://www.youtube.com/watch?v=0COg9I88yyQ](https://www.youtube.com/watch?v=0COg9I88yyQ): Sine waves being at a 180 degree phase difference<br>
+2. [://www.youtube.com/watch?v=WIY_7yH4kKo](https://www.youtube.com/watch?v=WIY_7yH4kKo): y = sin(x) and y = x periodic waveform
+
+The sample values of two waveforms are interweaved together in the PRU SRAM.
+PRU0 - Creates different waveforms on different channels using PWM
+PRU1 - For sample values transfer.
