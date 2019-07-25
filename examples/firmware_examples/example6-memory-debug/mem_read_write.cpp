@@ -14,12 +14,15 @@ int main()
         string data;
 
         // Choose which memory access is needed - read the enum from pruss.h
-        Memory mem = DATA0;
+        Memory mem = SHARED;
 
         // Start
         
         char off[4];
-        for(int i = 0; i < 100; i++){
+        for(int i = 0; i < 201; i++){
+            if (i == 102){
+                cout<<"donr --------------------------------";
+            }
             sprintf(off, "%i", i); 
             cout<<p0.mem_read(mem, off)<<endl;
         }

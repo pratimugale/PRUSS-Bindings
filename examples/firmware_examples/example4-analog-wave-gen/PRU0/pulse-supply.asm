@@ -5,12 +5,12 @@
 
 	.cdecls "main_pru0.c"
 
-PRU_DRAM0 .set 0x00000000                       ; Set the location of PRU0 Data Memory 
+PRU_SRAM .set 0x00010000                       ; Set the location of PRU0 Data Memory 
 
 	.clink
 	.global start
 start:                                          ; One time setup.
-        LDI32   R10, PRU_DRAM0                  ; R10 -> Base address of PRU DRAM0
+        LDI32   R10, PRU_SRAM                   ; R10 -> Base address of PRU DRAM0
         SUB     R7, R7, R7                      ; Clear the contents of R7
         LBBO    &R7.b0, R10, 1, 1               ; R7 -> Number of samples of the wave; Copy (1) bytes into R7 from memory address R10+offset(1)
         LDI     R11, 1                          ; R11-> To keep a count of the samples being done.
