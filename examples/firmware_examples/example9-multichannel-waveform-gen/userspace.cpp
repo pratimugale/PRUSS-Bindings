@@ -27,7 +27,7 @@ int main()
         waveform1[i] = (uint8_t)((bias + (gain * sin((i*freq) + phase1))));
     }
     for (i = 0; i < 100; i++){
-        waveform2[i] = i;
+        waveform2[i] = i*i/100;
        // waveform2[i] = (uint8_t)((bias + (gain * sin((i*freq) + phase2))));
     }
 
