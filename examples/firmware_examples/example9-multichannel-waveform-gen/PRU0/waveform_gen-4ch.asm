@@ -1,5 +1,5 @@
 ;* Source written by Pratim Ugale <pratim.ugale@gmail.com>
-;* Demonstrates 2-channel waveform generation
+;* Demonstrates 4-channel waveform generation
 ;* The samples are interveaved into the PRU SRAM.
 
 	.cdecls "main_pru0.c"
