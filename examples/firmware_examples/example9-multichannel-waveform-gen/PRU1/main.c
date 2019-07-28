@@ -77,53 +77,70 @@ volatile register uint32_t __R31;
 // RPMSG_BUF_SIZE = 512 bytes; pru_rpmsg_hdr header is of 16 bytes (minus the data[0] part); so maximum message length is of 496 bytes.
 void* payload[RPMSG_BUF_SIZE];
 
-/*
- * main.c
- */
-
 void main(void)
 {
 	struct pru_rpmsg_transport transport;
 	uint16_t src, dst, len;
 	volatile uint8_t *status;
 
-	/* AM335x must enable OCP master port access in order for the PRU to
-	 * read external memories.
+	/* AM335x must enable OCP(Open Core Protocol) master port access in order for the PRU to
+	 * read external memories. RPMsg basically reads the external memories.
 	 */
 	CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
 
-        volatile uint8_t* sram_pointer = (volatile uint8_t *) PRU_SRAM;
+
+        // Pointer to uint8_t to store the actual wave sampled values.
+        volatile uint8_t* sram_pointer_8bit = (volatile uint8_t *) PRU_SRAM;
+
+        // Pointer to uint32_t to store noOfSamples whose size is greater than 1 byte
+        volatile uint32_t* sram_pointer_32bit = (volatile uint32_t *) PRU_SRAM;
+
+        // Counter to keep track of address offsets.
         int i = 0;
 
-	/* Clear the status of the PRU-ICSS system event that the ARM will use to 'kick' us */
+
+	// Clear the status of the PRU-ICSS system event that the ARM will use to 'kick' us 
 	CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
 
-	/* Make sure the Linux drivers are ready for RPMsg communication */
+	// Make sure the Linux drivers are ready for RPMsg communication 
 	status = &resourceTable.rpmsg_vdev.status;
 	while (!(*status & VIRTIO_CONFIG_S_DRIVER_OK));
 
-	/* Initialize the RPMsg transport structure */
+	// Initialize the RPMsg transport structure 
 	pru_rpmsg_init(&transport, &resourceTable.rpmsg_vring0, &resourceTable.rpmsg_vring1, TO_ARM_HOST, FROM_ARM_HOST);
 
-	/* Create the RPMsg channel between the PRU and ARM user space using the transport structure. */
+	// Create the RPMsg channel between the PRU and ARM user space using the transport structure. 
 	while (pru_rpmsg_channel(RPMSG_NS_CREATE, &transport, CHAN_NAME, CHAN_DESC, CHAN_PORT) != PRU_RPMSG_SUCCESS);
 	while (1) {
-		/* Check bit 31 of register R31 to see if the ARM has kicked us */
+		// Check bit 31 of register R31 to see if the ARM has kicked us 
 		if (__R31 & HOST_INT) {
-			/* Clear the event status */
+			// Clear the event status 
 			CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
 
-			/* Receive one message*/
+			// Receive one message
 			while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len)==PRU_RPMSG_SUCCESS){
                         
-                            uint8_t x = *(uint8_t *) payload;
+                            if (i == 0){
+                                // Cast the void pointer to uint32_t* and then dereference it.
+                                uint32_t noOfSamples = *(uint32_t *) payload;
 
-                            //*(sram_pointer+i) = x; 
-                            *(sram_pointer+i) = x; 
-                            i++;
+                                // Store the incoming noOfSamples into the PRU SRAM at locations: 0x00010000 - 0x00010003.
+                                *(sram_pointer_32bit) = noOfSamples; 
 
+                                // Increment 'i' by 4 because the next waveform sample values are 1-byte uint8_t values i.e. increment by 32/8 = 4.
+                                i+=4;
+                            }
+                            else{
+                                // Cast the void pointer to uint8_t* and then dereference it.
+                                uint8_t samples = *(uint8_t *) payload;
+
+                                // Store the incoming wave sampled data into the PRU SRAM starting from 0x00010004.
+                                *(sram_pointer_8bit+i) = samples; 
+
+                                // Increment offset.
+                                i++;
+                            }
                         }
 		}
 	}
-	
 }

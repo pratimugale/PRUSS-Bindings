@@ -12,6 +12,14 @@ config:
 	@echo 'Waveform 3: P9_29'
 	@config-pin P9-28 pruout
 	@echo 'Waveform 4: P9_28'
+	@config-pin P9-27 pruout
+	@echo 'Waveform 5: P9_27'
+	@config-pin P9-25 pruout
+	@echo 'Waveform 6: P9_25'
+	@config-pin P8-11 pruout
+	@echo 'Waveform 7: P8_11'
+	@config-pin P8-12 pruout
+	@echo 'Waveform 8: P8_12'
 
 pru0:
 	@cd ./PRU0/ && make
