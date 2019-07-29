@@ -15,14 +15,14 @@ int main()
     uint8_t noOfChannels = 4;
 
     uint8_t i;
-    uint8_t waveform1[100]; 
-    uint8_t waveform2[100]; 
-    uint8_t waveform3[100]; 
-    uint8_t waveform4[100]; 
-    uint8_t waveform5[100]; 
-    uint8_t waveform6[100]; 
-    uint8_t waveform7[100]; 
-    uint8_t waveform8[100]; 
+    uint8_t waveform1[101]; 
+    uint8_t waveform2[101]; 
+    uint8_t waveform3[101]; 
+    uint8_t waveform4[101]; 
+    uint8_t waveform5[101]; 
+    uint8_t waveform6[101]; 
+    uint8_t waveform7[101]; 
+    uint8_t waveform8[101]; 
     float gain = 50.0f;
     float phase1 = 0.0f;
     float phase2 = 1.0f * (float)PI/8;
@@ -34,9 +34,10 @@ int main()
     float phase8 = 7.0f * (float)PI/8;
     float bias = 50.0f;
     float freq1 = 2.0f * (float)PI / 50.0f;
+    float freq2 = 2.0f * (float)PI / 75.0f;
     float freq = 2.0f * (float)PI / 100.0f;
     
-    for (i = 0; i < 100; i++){
+    for (i = 0; i < 101; i++){
 
         if (i >= 50){
             waveform1[i] = (uint8_t)150;
@@ -47,32 +48,57 @@ int main()
         }
     }
 
-    for (i = 0; i < 100; i++){
-        waveform2[i] = (uint8_t)((bias + (gain * sin((i*freq) + phase2))));
+    for (i = 0; i < 101; i++){
+        if ( i >= 75){
+            waveform2[i] = (uint8_t)150;
+        }
+
+        else{
+            //waveform2[i] = (uint8_t)((bias + (gain * sin((i*freq2) + phase2))));
+            waveform2[i] = (uint8_t)i;
+        }
     }
 
-    for (i = 0; i < 100; i++){
+    for (i = 0; i < 101; i++){
         waveform3[i] = (uint8_t)((bias + (gain * sin((i*freq) + phase3))));
+        if (i == 100){
+            waveform3[i] = 150;
+        }
     }
     
-    for (i = 0; i < 100; i++){
+    for (i = 0; i < 101; i++){
         waveform4[i] = (uint8_t)((bias + (gain * sin((i*freq) + phase4))));
+        if (i == 100){
+            waveform4[i] = 150;
+        }
     }
 
-    for (i = 0; i < 100; i++){
+    for (i = 0; i < 101; i++){
         waveform5[i] = (uint8_t)((bias + (gain * sin((i*freq) + phase5))));
+        if (i == 100){
+            waveform5[i] = 150;
+        }
     }
 
-    for (i = 0; i < 100; i++){
+    for (i = 0; i < 101; i++){
         waveform6[i] = (uint8_t)((bias + (gain * sin((i*freq) + phase6))));
+        if (i == 100){
+            waveform6[i] = 150;
+        }
     }
 
-    for (i = 0; i < 100; i++){
+    for (i = 0; i < 101; i++){
         waveform7[i] = (uint8_t)((bias + (gain * sin((i*freq) + phase7))));
+        if (i == 100){
+            waveform7[i] = 150;
+        }
     }
     
-    for (i = 0; i < 100; i++){
+    for (i = 0; i < 101; i++){
         waveform8[i] = (uint8_t)((bias + (gain * sin((i*freq) + phase8))));
+        if (i == 100){
+            waveform8[i] = 150;
+        }
     }
 
     // TODO************
@@ -82,7 +108,7 @@ int main()
 
     p1.sendMsg_raw(to_string(totalNoOfSamples));
 
-    for(i = 0; i < 100; i++){
+    for(i = 0; i < 101; i++){
             p1.sendMsg_raw(to_string(waveform1[i]));
             cout<<(int)waveform1[i]<<endl;
             p1.sendMsg_raw(to_string(waveform2[i]));

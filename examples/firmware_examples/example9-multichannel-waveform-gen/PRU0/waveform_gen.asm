@@ -18,38 +18,72 @@ start:                              ; One time setup.
         LDI32   R17, 0
         QBA     sample_start
         SUB     R16, R16, R16
-        LDI     R18, 4
+        LDI     R18.w0, 4
+        LDI     R18.w2, 5
+        LDI     R19.w0, 6
+        LDI     R19.w2, 7
+        LDI     R20.w0, 8
+        LDI     R20.w2, 9
+        LDI     R21.w0, 10
+        LDI     R21.w2, 11
 
 sample_start:                       ; 
         
-        QBLT    same_sample, R5, R17
-        LDI32   R17, 0
-        LDI     R11, 3
+        ;QBLT    same_sample, R5, R11
+        ;LDI32   R17, 0
+        ;LDI     R11, 3
 
 same_sample:                          ; 
-        LBBO    &R7.b0, R10, R18, 1   ; R7 -> DC of Wave 1
+        LBBO    &R7.b0, R10, R18.w0, 1   ; R7 -> DC of Wave 1
+        ADD     R18.w0, R18.w0, 0x00000008  ; Increment offset counter by 1 
         QBNE    same_sample_1, R7.b0, 0x96;
-        LDI     R18, 4
-        ;LBBO    &R7.b0, R10, R18, 1   ; R7 -> DC of Wave 1
+        LDI     R18.w0, 4
 
 same_sample_1:
-        ADD     R18, R18, 0x00000008  ; Increment offset counter by 1 
-        ADD     R11, R11, 0x00000002  ; Increment offset counter by 1 
-        LBBO    &R8.b0, R10, R11, 1   ; R8 -> DC of Wave 2
-        ADD     R11, R11, 0x00000001  ; Increment offset counter by 1 
-        LBBO    &R7.b1, R10, R11, 1   ; R8 -> DC of Wave 3
-        ADD     R11, R11, 0x00000001  ; Increment offset counter by 1 
-        LBBO    &R8.b1, R10, R11, 1   ; R8 -> DC of Wave 3
-        ADD     R11, R11, 0x00000001  ; Increment offset counter by 1 
-        LBBO    &R7.b2, R10, R11, 1   ; R7 -> DC of Wave 1
-        ADD     R11, R11, 0x00000001  ; Increment offset counter by 1 
-        LBBO    &R8.b2, R10, R11, 1   ; R8 -> DC of Wave 2
-        ADD     R11, R11, 0x00000001  ; Increment offset counter by 1 
-        LBBO    &R7.b3, R10, R11, 1   ; R8 -> DC of Wave 3
-        ADD     R11, R11, 0x00000001  ; Increment offset counter by 1 
-        LBBO    &R8.b3, R10, R11, 1   ; R8 -> DC of Wave 3
-        ADD     R17, R17, 8
-        LDI32   R12, 1225             ; 
+        LBBO    &R8.b0, R10, R18.w2, 1   ; R7 -> DC of Wave 1
+        ADD     R18.w2, R18.w2, 0x00000008  ; Increment offset counter by 1 
+        QBNE    same_sample_2, R8.b0, 0x96;
+        LDI     R18.w2, 5
+
+same_sample_2:
+        LBBO    &R7.b1, R10, R19.w0, 1   ; R7 -> DC of Wave 1
+        ADD     R19.w0, R19.w0, 0x00000008  ; Increment offset counter by 1 
+        QBNE    same_sample_3, R7.b1, 0x96;
+        LDI     R19.w0, 6
+
+same_sample_3:
+        LBBO    &R8.b1, R10, R19.w2, 1   ; R7 -> DC of Wave 1
+        ADD     R19.w2, R19.w2, 0x00000008  ; Increment offset counter by 1 
+        QBNE    same_sample_4, R8.b1, 0x96;
+        LDI     R19.w2, 7
+
+same_sample_4:
+        LBBO    &R7.b2, R10, R20.w0, 1   ; R7 -> DC of Wave 1
+        ADD     R20.w0, R20.w0, 0x00000008  ; Increment offset counter by 1 
+        QBNE    same_sample_5, R7.b2, 0x96;
+        LDI     R20.w0, 8
+
+same_sample_5:
+        LBBO    &R8.b2, R10, R20.w2, 1   ; R7 -> DC of Wave 1
+        ADD     R20.w2, R20.w2, 0x00000008  ; Increment offset counter by 1 
+        QBNE    same_sample_6, R8.b2, 0x96;
+        LDI     R20.w2, 9
+
+same_sample_6:
+        LBBO    &R7.b3, R10, R21.w0, 1   ; R7 -> DC of Wave 1
+        ADD     R21.w0, R21.w0, 0x00000008  ; Increment offset counter by 1 
+        QBNE    same_sample_7, R7.b3, 0x96;
+        LDI     R21.w0, 10
+
+same_sample_7:
+        LBBO    &R8.b3, R10, R21.w2, 1   ; R7 -> DC of Wave 1
+        ADD     R21.w2, R21.w2, 0x00000008  ; Increment offset counter by 1 
+        QBNE    same_sample_8, R8.b3, 0x96;
+        LDI     R21.w2, 11
+
+same_sample_8:
+
+        LDI32   R12, 1212             ; 
         LDI     R9,  0                ; DC ON counter.
         LDI     R15, 0                ; DC OFF counter.
         LDI32   R13, 0                ; Pulse counter.
@@ -136,13 +170,13 @@ pwm1_low:
         SUB     R9, R9, R9
 
 start_pwm2: 
-        SET     R30, R30.t7
+        SET     R30, R30.t0
         SUB     R14.b0, R6.b0, R8.b0
  
 pwm2_high:
         ADD     R9, R9, 0x00000001
         QBNE    pwm2_high, R9.b0, R8.b0
-        CLR     R30, R30.t7
+        CLR     R30, R30.t0
 
 pwm2_low:
         ADD     R15, R15, 0x00000001
@@ -181,13 +215,13 @@ pwm4_low:
         SUB     R9, R9, R9
 
 start_pwm5: 
-        SET     R30, R30.t0
+        SET     R30, R30.t7
         SUB     R14.b0, R6.b0, R7.b2
         
 pwm5_high:
         ADD     R9, R9, 0x00000001
         QBNE    pwm5_high, R9.b0, R7.b2
-        CLR     R30, R30.t0
+        CLR     R30, R30.t7
 
 pwm5_low:
         ADD     R15, R15, 0x00000001
