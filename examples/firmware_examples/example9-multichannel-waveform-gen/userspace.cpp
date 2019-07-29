@@ -33,10 +33,18 @@ int main()
     float phase7 = 6.0f * (float)PI/8;
     float phase8 = 7.0f * (float)PI/8;
     float bias = 50.0f;
+    float freq1 = 2.0f * (float)PI / 50.0f;
     float freq = 2.0f * (float)PI / 100.0f;
     
     for (i = 0; i < 100; i++){
-        waveform1[i] = (uint8_t)((bias + (gain * sin((i*freq) + phase1))));
+
+        if (i >= 50){
+            waveform1[i] = (uint8_t)150;
+        }
+        
+        else{
+            waveform1[i] = (uint8_t)((bias + (gain * sin((i*freq1) + phase1))));
+        }
     }
 
     for (i = 0; i < 100; i++){
@@ -76,6 +84,7 @@ int main()
 
     for(i = 0; i < 100; i++){
             p1.sendMsg_raw(to_string(waveform1[i]));
+            cout<<(int)waveform1[i]<<endl;
             p1.sendMsg_raw(to_string(waveform2[i]));
             p1.sendMsg_raw(to_string(waveform3[i]));
             p1.sendMsg_raw(to_string(waveform4[i]));

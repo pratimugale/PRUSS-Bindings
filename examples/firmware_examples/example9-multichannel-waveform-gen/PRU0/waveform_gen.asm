@@ -18,6 +18,7 @@ start:                              ; One time setup.
         LDI32   R17, 0
         QBA     sample_start
         SUB     R16, R16, R16
+        LDI     R18, 4
 
 sample_start:                       ; 
         
@@ -26,9 +27,14 @@ sample_start:                       ;
         LDI     R11, 3
 
 same_sample:                          ; 
-        ADD     R11, R11, 0x00000001  ; Increment offset counter by 1 
-        LBBO    &R7.b0, R10, R11, 1   ; R7 -> DC of Wave 1
-        ADD     R11, R11, 0x00000001  ; Increment offset counter by 1 
+        LBBO    &R7.b0, R10, R18, 1   ; R7 -> DC of Wave 1
+        QBNE    same_sample_1, R7.b0, 0x96;
+        LDI     R18, 4
+        ;LBBO    &R7.b0, R10, R18, 1   ; R7 -> DC of Wave 1
+
+same_sample_1:
+        ADD     R18, R18, 0x00000008  ; Increment offset counter by 1 
+        ADD     R11, R11, 0x00000002  ; Increment offset counter by 1 
         LBBO    &R8.b0, R10, R11, 1   ; R8 -> DC of Wave 2
         ADD     R11, R11, 0x00000001  ; Increment offset counter by 1 
         LBBO    &R7.b1, R10, R11, 1   ; R8 -> DC of Wave 3
@@ -43,7 +49,7 @@ same_sample:                          ;
         ADD     R11, R11, 0x00000001  ; Increment offset counter by 1 
         LBBO    &R8.b3, R10, R11, 1   ; R8 -> DC of Wave 3
         ADD     R17, R17, 8
-        LDI32   R12, 1250             ; 
+        LDI32   R12, 1225             ; 
         LDI     R9,  0                ; DC ON counter.
         LDI     R15, 0                ; DC OFF counter.
         LDI32   R13, 0                ; Pulse counter.
@@ -115,13 +121,13 @@ count_check:
         QBEQ    sample_start, R13, R12
 
 start_pwm1: 
-        SET     R30, R30.t5
+        SET     R30, R30.t1
         SUB     R14.b0, R6.b0, R7.b0
         
 pwm1_high:
         ADD     R9, R9, 0x00000001
         QBNE    pwm1_high, R9.b0, R7.b0
-        CLR     R30, R30.t5
+        CLR     R30, R30.t1
 
 pwm1_low:
         ADD     R15, R15, 0x00000001
@@ -205,13 +211,13 @@ pwm6_low:
         SUB     R9, R9, R9
 
 start_pwm7: 
-        SET     R30, R30.t1
+        SET     R30, R30.t5
         SUB     R14.b0, R6.b0, R7.b3
         
 pwm7_high:
         ADD     R9, R9, 0x00000001
         QBNE    pwm7_high, R9.b0, R7.b3
-        CLR     R30, R30.t1
+        CLR     R30, R30.t5
 
 pwm7_low:
         ADD     R15, R15, 0x00000001
