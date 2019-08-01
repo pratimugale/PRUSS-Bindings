@@ -19,7 +19,7 @@ int main()
         // Start
         
         char off[4];
-        for(int i = 0; i < 201; i++){
+        for(int i = 0; i < 888; i++){
             if (i == 102){
                 cout<<"donr --------------------------------";
             }

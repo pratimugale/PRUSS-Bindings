@@ -163,7 +163,8 @@ def send_msg(cmd):
         mode = str(cmd[1])
         chan_name = str(cmd[2])
         chan_port = int(cmd[3])
-        int_data = int(cmd[4])
+        if mode == 'r':
+            int_data = int(cmd[4])
     except ValueError:
         return -errno.EINVAL
                                                                         
