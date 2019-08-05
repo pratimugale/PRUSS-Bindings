@@ -1,4 +1,4 @@
-language: python3
+language: generic
 
 os:
     -linux
@@ -9,6 +9,10 @@ before_install:
     - tar xf gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf.tar.xz
     - export PATH=$PATH:$PWD/gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf/bin/
     - arm-linux-gnueabihf-gcc --version
+    - whereis systemctl
+    - sudo dpkg -l | grep systemd
+    - sudo apt-get install systemd
+    
 
 script:
     # exporting the variable to be used by make utility  
@@ -23,6 +27,10 @@ script:
     
     #copy the config file
     - sudo cp -v "${DIR}/prussd/prussd.conf" "/etc/default/prussd.conf"
+
+    - echo $DIR
+
+    - pwd
     
     #edit the unit file to replace DIR by the actual path
     - sudo sed -i -e "s:DIR:${DIR}:" "/lib/systemd/system/prussd.service"
@@ -33,14 +41,8 @@ script:
     #mark the daemon script as executable
     - chmod a+x "${DIR}/prussd/prussd.py"
 
-    - whereis systemctl
-
-    - sudo dpkg -l | grep systemd
-
-    - sudo apt-get install systemd
-    
     #enable the service
-    - sudo systemctl enable prussd.service
+    - sudo systemctl start prussd.service
     
     #reload the systemctl daemons
     - sudo systemctl daemon-reload
