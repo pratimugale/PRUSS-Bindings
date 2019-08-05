@@ -19,28 +19,28 @@ script:
     - export DIR=$(pwd -P)
 
     #copy the systemd unit configuration file
-    - cp -v "${DIR}/prussd/prussd.service" "/lib/systemd/system/prussd.service"
+    - sudo cp -v "${DIR}/prussd/prussd.service" "/lib/systemd/system/prussd.service"
     
     #copy the config file
-    - cp -v "${DIR}/prussd/prussd.conf" "/etc/default/prussd.conf"
+    - sudo cp -v "${DIR}/prussd/prussd.conf" "/etc/default/prussd.conf"
     
     #edit the unit file to replace DIR by the actual path
-    - sed -i -e "s:DIR:${DIR}:" "/lib/systemd/system/prussd.service"
+    - sudo sed -i -e "s:DIR:${DIR}:" "/lib/systemd/system/prussd.service"
                            
     #edit the config file to include paths to firmware_examples
-    - sed -i -e "s:DIR:${DIR}:" "/etc/default/prussd.conf"
+    - sudo sed -i -e "s:DIR:${DIR}:" "/etc/default/prussd.conf"
                                        
     #mark the daemon script as executable
     - chmod a+x "${DIR}/prussd/prussd.py"
     
     #enable the service
-    - systemctl enable prussd.service
+    - sudo systemctl enable prussd.service
     
     #reload the systemctl daemons
-    - systemctl daemon-reload
+    - sudo systemctl daemon-reload
                                                                    
     #start the prussd daemon
-    - systemctl start prussd.service 
+    - sudo systemctl start prussd.service 
 
     #make an example 
     - cd examples/firmware_examples/example9-multichannel-waveform-gen/ && make userspace
