@@ -4,7 +4,7 @@ os:
     -linux
 
 before_install:
-    - sudo apt-get update
+    #    - sudo apt-get update
     - wget -c https://releases.linaro.org/components/toolchain/binaries/7.4-2019.02/arm-linux-gnueabihf/gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf.tar.xz
     - tar xf gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf.tar.xz
     - export PATH=$PATH:$PWD/gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf/bin/
@@ -32,6 +32,12 @@ script:
                                        
     #mark the daemon script as executable
     - chmod a+x "${DIR}/prussd/prussd.py"
+
+    - whereis systemctl
+
+    - sudo dpkg -l | grep systemd
+
+    - sudo apt-get install systemd
     
     #enable the service
     - sudo systemctl enable prussd.service
