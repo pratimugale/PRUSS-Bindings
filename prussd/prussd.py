@@ -15,13 +15,13 @@ import os
 import select
 import shutil
 import stat
-#import socketserver
+import socketserver
 import subprocess
 import threading
 import mmap     # For memory functions
 import struct   # For memory functions 
 
-PRU_ICSS     = 0x4a300000;     # This is the address of the PRU Subsystem on the RAM
+PRU_ICSS     = 0x4a300000     # This is the address of the PRU Subsystem on the RAM
 PRU_ICSS_SIZE = 512*1024      # This is the length of the PRU subsystem ie it is of 512 K
 PRU_DRAM0    = 0x00000000     # Data RAM of PRU0 (8KB)- Refer /Documentation/pru_memory+dma_walkthrough.md 
 PRU_DRAM1    = 0x00002000     # Data RAM of PRU1 (8KB)
@@ -312,6 +312,8 @@ class ThreadedPRUServer(socketserver.ThreadingMixIn, socketserver.UnixStreamServ
 
 
 if __name__ == "__main__":
+
+    hello
 
     # if socket exists, unlink/remove it
     try:
