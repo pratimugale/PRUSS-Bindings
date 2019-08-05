@@ -51,4 +51,5 @@ script:
     - sudo systemctl start prussd.service 
 
     #make an example 
-    - cd examples/firmware_examples/example9-multichannel-waveform-gen/ && make userspace
+    - export CC=arm-linux-gnueabihf-gcc
+    - cd examples/firmware_examples/example9-multichannel-waveform-gen/ && ${CC} userspace.cpp ../../../cpp-bindings/pruss.cpp -o travis.o
