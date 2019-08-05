@@ -16,7 +16,7 @@ script:
     - export CROSS_COMPILE=arm-linux-gnueabihf-
     #- make
 
-    - DIR=$(cd `dirname $BASH_SOURCE[0]` && pwd -P)
+    - export DIR=$(pwd -P)
 
     #copy the systemd unit configuration file
     - cp -v "${DIR}/prussd/prussd.service" "/lib/systemd/system/prussd.service"
