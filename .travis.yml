@@ -1,0 +1,43 @@
+language: python3
+
+os:
+    -linux
+
+before_install:
+    - sudo apt-get update
+    - wget -c https://releases.linaro.org/components/toolchain/binaries/7.4-2019.02/arm-linux-gnueabihf/gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf.tar.xz
+    - tar xf gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf.tar.xz
+    - export PATH=$PATH:$PWD/gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf/bin/
+    - arm-linux-gnueabihf-gcc --version
+
+script:
+    # exporting the variable to be used by make utility  
+    - export ARCH=arm 
+    - export CROSS_COMPILE=arm-linux-gnueabihf-
+    #- make
+    #copy the systemd unit configuration file
+    - cp -v "${DIR}/prussd/prussd.service" "/lib/systemd/system/prussd.service"
+    
+    #copy the config file
+    - cp -v "${DIR}/prussd/prussd.conf" "/etc/default/prussd.conf"
+    
+    #edit the unit file to replace DIR by the actual path
+    - sed -i -e "s:DIR:${DIR}:" "/lib/systemd/system/prussd.service"
+                           
+    #edit the config file to include paths to firmware_examples
+    - sed -i -e "s:DIR:${DIR}:" "/etc/default/prussd.conf"
+                                       
+    #mark the daemon script as executable
+    - chmod a+x "${DIR}/prussd/prussd.py"
+    
+    #enable the service
+    - systemctl enable prussd.service
+    
+    #reload the systemctl daemons
+    - systemctl daemon-reload
+                                                                   
+    #start the prussd daemon
+    - systemctl start prussd.service 
+
+    #make an example 
+    - cd examples/firmware_examples/example9-multichannel-waveform-gen/ && make
