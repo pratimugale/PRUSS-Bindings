@@ -18,12 +18,13 @@ int main()
     float bias = 50.0f;
     float freq = 2.0f * 3.14159f / 100.0f;
     
-    for (i = 0; i < 100; i++){
-        waveform[i] = (uint8_t)(bias + (gain * sin((i*freq) + phase)));
-    }
-    
     uint8_t samplestep = 1;    //delay factor
     uint8_t numbersamples = 100;
+
+    for (i = 0; i < 100; i++){
+        waveform[i+2] = (uint8_t)(bias + (gain * sin((i*freq) + phase)));
+    }
+    
 
     p1.sendMsg_raw(to_string(samplestep));
     p1.sendMsg_raw(to_string(numbersamples));

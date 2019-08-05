@@ -7,6 +7,7 @@ install:
 	@cd ./PRU1/ && make
 	@g++ userspace.cpp ../../../../cpp-bindings/pruss.cpp -o userspace.o
 	@./userspace.o
+	#@python userspace_pwm.py
 
 clean:
 	@cd ./PRU0/ && make clean

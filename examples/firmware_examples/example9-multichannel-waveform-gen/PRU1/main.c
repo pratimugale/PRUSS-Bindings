@@ -31,6 +31,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+//This Firmware Code serves as an example to read and deserialize the data written in the message buffer.
+
 #include <stdint.h>
 #include <stdio.h>
 #include <pru_cfg.h>
@@ -42,11 +44,13 @@
 
 volatile register uint32_t __R31;
 
+#define PRU_SRAM 0x00010000
+
 /* Host-1 Interrupt sets bit 31 in register R31 */
 #define HOST_INT			((uint32_t) 1 << 31)
 
 /* The PRU-ICSS system events used for RPMsg are defined in the Linux device tree
- * In this lab, PRU1 uses system event 18 (To ARM) and 19 (From ARM)
+ * In this example, PRU1 uses system event 18 (To ARM) and 19 (From ARM)
  */
 #define TO_ARM_HOST			18
 #define FROM_ARM_HOST			19
@@ -70,9 +74,8 @@ volatile register uint32_t __R31;
  */
 #define VIRTIO_CONFIG_S_DRIVER_OK	4
 
-uint8_t payload[RPMSG_BUF_SIZE];
-
-#define PRU_SRAM 0x00010000 
+// RPMSG_BUF_SIZE = 512 bytes; pru_rpmsg_hdr header is of 16 bytes (minus the data[0] part); so maximum message length is of 496 bytes.
+void* payload[RPMSG_BUF_SIZE];
 
 void main(void)
 {
@@ -80,63 +83,64 @@ void main(void)
 	uint16_t src, dst, len;
 	volatile uint8_t *status;
 
-        // pointer to shared memory with offset 0
-        volatile int32_t *ptr_shared_mem = (volatile int32_t *) PRU_SRAM;
-        uint8_t hex10;
-        uint8_t hex1;
-        uint8_t decimal;
-
-	/* AM335x must enable OCP master port access in order for the PRU to
-	 * read external memories.
+	/* AM335x must enable OCP(Open Core Protocol) master port access in order for the PRU to
+	 * read external memories. RPMsg basically reads the external memories.
 	 */
 	CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
 
-	/* Clear the status of the PRU-ICSS system event that the ARM will use to 'kick' us */
+
+        // Pointer to uint8_t to store the actual wave sampled values.
+        volatile uint8_t* sram_pointer_8bit = (volatile uint8_t *) PRU_SRAM;
+
+        // Pointer to uint32_t to store noOfSamples whose size is greater than 1 byte
+        volatile uint32_t* sram_pointer_32bit = (volatile uint32_t *) PRU_SRAM;
+
+        // Counter to keep track of address offsets.
+        int i = 0;
+
+
+	// Clear the status of the PRU-ICSS system event that the ARM will use to 'kick' us 
 	CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
 
-	/* Make sure the Linux drivers are ready for RPMsg communication */
+	// Make sure the Linux drivers are ready for RPMsg communication 
 	status = &resourceTable.rpmsg_vdev.status;
 	while (!(*status & VIRTIO_CONFIG_S_DRIVER_OK));
 
-	/* Initialize the RPMsg transport structure */
+	// Initialize the RPMsg transport structure 
 	pru_rpmsg_init(&transport, &resourceTable.rpmsg_vring0, &resourceTable.rpmsg_vring1, TO_ARM_HOST, FROM_ARM_HOST);
 
-	/* Create the RPMsg channel between the PRU and ARM user space using the transport structure. */
+	// Create the RPMsg channel between the PRU and ARM user space using the transport structure. 
 	while (pru_rpmsg_channel(RPMSG_NS_CREATE, &transport, CHAN_NAME, CHAN_DESC, CHAN_PORT) != PRU_RPMSG_SUCCESS);
 	while (1) {
-		/* Check bit 31 of register R31 to see if the ARM has kicked us */
+		// Check bit 31 of register R31 to see if the ARM has kicked us 
 		if (__R31 & HOST_INT) {
-			/* Clear the event status */
+			// Clear the event status 
 			CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
 
-                        // Receive hexadecimal number, whose digits are the elements of payload array
-			while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len) == PRU_RPMSG_SUCCESS) {
-                                // 10s digit
-                                hex10 = payload[0];
-                                // units digit
-                                hex1  = payload[1];
-                                
-                                // Convert ASCII to hexadecimal digits
-                                if (hex10 >= 48 && hex10 <= 57 ){
-                                        hex10 -= 48;
-                                }
-                                else if (hex10 >= 65 && hex10 <= 70){
-                                        hex10 -= 55;
-                                }
+			// Receive one message
+			while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len)==PRU_RPMSG_SUCCESS){
+                        
+                            if (i == 0){
+                                // Cast the void pointer to uint32_t* and then dereference it.
+                                uint32_t noOfSamples = *(uint32_t *) payload;
 
-                                if (hex1 >= 48 && hex1 <= 57 ){
-                                        hex1 -= 48;
-                                }
-                                else if (hex1 >= 65 && hex1 <= 70){
-                                        hex1 -= 55;
-                                }
-                                
-                                // Convert hexadecimal to decimal
-                                decimal = (16*hex10) + hex1;
+                                // Store the incoming noOfSamples into the PRU SRAM at locations: 0x00010000 - 0x00010003.
+                                *(sram_pointer_32bit) = noOfSamples; 
 
-                                // Write to shared memory.
-                                *(ptr_shared_mem) = decimal;
-			}
+                                // Increment 'i' by 4 because the next waveform sample values are 1-byte uint8_t values i.e. increment by 32/8 = 4.
+                                i+=4;
+                            }
+                            else{
+                                // Cast the void pointer to uint8_t* and then dereference it.
+                                uint8_t samples = *(uint8_t *) payload;
+
+                                // Store the incoming wave sampled data into the PRU SRAM starting from 0x00010004.
+                                *(sram_pointer_8bit+i) = samples; 
+
+                                // Increment offset.
+                                i++;
+                            }
+                        }
 		}
 	}
 }
