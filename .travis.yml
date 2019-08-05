@@ -42,13 +42,15 @@ script:
     - chmod a+x "${DIR}/prussd/prussd.py"
 
     #enable the service
-    - sudo systemctl start prussd.service
+    - sudo systemctl enable prussd.service
     
     #reload the systemctl daemons
     - sudo systemctl daemon-reload
                                                                    
     #start the prussd daemon
     - sudo systemctl start prussd.service 
+
+    - sudo systemctl status prussd.service
 
     #make an example 
     - export CC=arm-linux-gnueabihf-g++
