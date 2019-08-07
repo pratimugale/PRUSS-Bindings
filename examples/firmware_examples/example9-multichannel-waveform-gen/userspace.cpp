@@ -42,7 +42,7 @@ int main()
     
     for (i = 0; i < 101; i++){
 
-        if (i >= 50){
+        if (i >= 100){
             waveform1[i] = (uint8_t)150;
         }
         

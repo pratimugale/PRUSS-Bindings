@@ -201,8 +201,8 @@ int PRU::load(string fw)
 
 void PRU::setChannel()
 {
-	this->chanPort = (this->number)?31:30;
-	this->chanName = "rpmsg_pru";
+	this->chanPort = (this->number)?1:0;
+	this->chanName = "pruss_api_pru";
 }
 
 int PRU::setChannel(int port, string name)
