@@ -1,12 +1,15 @@
 # PRUSS Bindings - An API to control the BBB PRUs
 An API across multiple programming languages to use with the PRUs to load binaries, start/stop, and communicate with the PRUs from the ARM userspace.<br>
 An Introductory Video describing the project: [https://www.youtube.com/watch?v=3Z2PxDIoCpE&t=5s](https://www.youtube.com/watch?v=3Z2PxDIoCpE&t=5s)<br>
-Example of using the API: [https://www.youtube.com/watch?v=W-Kr37lqM98](https://www.youtube.com/watch?v=W-Kr37lqM98)
+An example made using the API: [https://www.youtube.com/watch?v=W-Kr37lqM98](https://www.youtube.com/watch?v=W-Kr37lqM98)
 
 ## Overview
+Look at a given [example](https://github.com/pratimugale/PRUSS-Bindings/tree/pruss-api-driver/examples/firmware_examples/example2-rpmsg-pru1/rpmsg_echo.cpp)
 The `cpp-bindings` interact with the Python Daemon Service through UNIX Domain Sockets.
 cpp-bindings contains functions that the userspace program will use; the cpp-bindings would then pass the appropriate request to the daemon through the socket file (path: /tmp/prussd.sock). The daemon performs the required task with the PRU and sends back the return value. The advantage of having a daemon is that userspace apps don't need to deal with root permissions, although restricting access to the socket is necessary.
 The bindings for other scripting languages can then be built upon the cpp-bindings using SWIG, which generates wrapper functions for C/C++ programs. Bindings have also been provided for 'C' language in case the user wants to work with C instead of using OOP.
+
+![Workflow](./Documentation/workflow.jpg?raw=true)
 
 ## Contents
 * `prussd/` : <br>
@@ -16,7 +19,7 @@ The bindings for other scripting languages can then be built upon the cpp-bindin
 * `c-bindings/` : <br>
   The Directory which contains the C bindings using the prussd daemon service.
 * `examples/` : <br>
-  The directory which contains the example codes using the bindings. Contains firmware examples as well.
+  The Directory which contains the example codes using the bindings. Contains firmware examples as well.
     * `example1/`: A simple LED Blinky example.
     * `example2-rpmsg-pru1/`: RPMsg Loopback - simplest RPMsg firmware for testing.
     * `example3-pwm/`: A PWM generator maximum frequency of about 1MHz.
@@ -39,7 +42,16 @@ The bindings for other scripting languages can then be built upon the cpp-bindin
 
 ## Installation Guide
 
-### `config-pin`: requires changes in uEnv.txt - HDMI should be disabled. Otherwise this error is encountered:<br>
+### Compiling the `pruss_api.c` driver: <br>
+1. `sudo apt-get update`
+2. `apt-cache search linux-headers-$(uname -r)`
+3. `sudo apt-get install linux-headers-4.14.71-ti-r80`: Install the linux-headers-$(uname -r) for your kernel.
+4. The linux headers should now be present in the `/usr/src/` directory.
+5. Now, `cd drivers && make`
+6. `sudo insmod pruss_api.ko`
+
+### `config-pin`: requires changes in uEnv.txt <br>
+HDMI should be disabled. Otherwise this error is encountered:<br>
 ```
 P9_31 pinmux file not found!
 bash: /sys/devices/platform/ocp/ocp*P9_31_pinmux/state: No such file or directory
@@ -57,14 +69,6 @@ Make sure that the proper version of prussd.py is running. Disable any previous 
    `sudo systemctl start prussd.service`<br>
    `systemctl status prussd.service`
 
-### Compiling the `pruss_api.c` driver: <br>
-1. `sudo apt-get update`
-2. `apt-cache search linux-headers-$(uname -r)`
-3. `sudo apt-get install linux-headers-4.14.71-ti-r80`: Install the linux-headers-$(uname -r) for your kernel.
-4. The linux headers should now be present in the `/usr/src/` directory.
-5. Now, `cd drivers && make`
-6. `sudo insmod pruss_api.ko`
-
 ### Make sure that proper paths and symbolic links have been made for clpru and lnkpru.<br>
 The PRU compiler and linker are already installed on the standard images. They are called clpru and lnkpru.<br>
 1. `export PRU_CGT=/usr/share/ti/cgt-pru`
@@ -72,7 +76,7 @@ The PRU compiler and linker are already installed on the standard images. They a
 3. `mkdir -p bin`
 4. `cd bin`
 5. `ln -s `which clpru`  .`
-6. `ln -s `which lnkpru` .`
+6. `ln -s ```which lnkpru``` .` <br>
 Refer [https://zeekhuge.me/post/ptp_blinky/](https://zeekhuge.me/post/ptp_blinky/) and [https://groups.google.com/forum/#!topic/beagleboard/MBmIm0EnNfc](https://groups.google.com/forum/#!topic/beagleboard/MBmIm0EnNfc)
 
 ### [RPMsg Guide](https://github.com/pratimugale/PRUSS-Bindings/blob/master/Documentation/RPMsg.md)
