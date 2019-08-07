@@ -4,10 +4,11 @@ An Introductory Video describing the project: [https://www.youtube.com/watch?v=3
 An example made using the API: [https://www.youtube.com/watch?v=W-Kr37lqM98](https://www.youtube.com/watch?v=W-Kr37lqM98)
 
 ## Overview
-Look at a given [example](https://github.com/pratimugale/PRUSS-Bindings/tree/pruss-api-driver/examples/firmware_examples/example2-rpmsg-pru1/rpmsg_echo.cpp)
-The `cpp-bindings` interact with the Python Daemon Service through UNIX Domain Sockets.
-cpp-bindings contains functions that the userspace program will use; the cpp-bindings would then pass the appropriate request to the daemon through the socket file (path: /tmp/prussd.sock). The daemon performs the required task with the PRU and sends back the return value. The advantage of having a daemon is that userspace apps don't need to deal with root permissions, although restricting access to the socket is necessary.
-The bindings for other scripting languages can then be built upon the cpp-bindings using SWIG, which generates wrapper functions for C/C++ programs. Bindings have also been provided for 'C' language in case the user wants to work with C instead of using OOP.
+Look at a given [example.](https://github.com/pratimugale/PRUSS-Bindings/tree/pruss-api-driver/examples/firmware_examples/example2-rpmsg-pru1/rpmsg_echo.cpp)
+This is how any User Space program will be while using this project. `pruss.cpp` is present in `/cpp-bindings` of this repo.<br>
+The `cpp-bindings` interact with the Python Daemon Service through a UNIX Domain Socket file at `/tmp/pruss.sock` of the Linux file system.<br>
+The `cpp-bindings` passes the appropriate request to the daemon through the socket file. The daemon performs the required PRU-related task with root permissions and sends back the return value. <br>
+The bindings for other scripting languages can then be built upon the cpp-bindings using SWIG, which takes C++ declarations and creates wrappers needed to access those declarations from other languages. Bindings have also been provided for 'C' language.<br>
 
 ![Workflow](./Documentation/workflow.jpg?raw=true)
 
@@ -50,6 +51,14 @@ The bindings for other scripting languages can then be built upon the cpp-bindin
 5. Now, `cd drivers && make`
 6. `sudo insmod pruss_api.ko`
 
+### Install the `prussd.py` Daemon.<br>
+Make sure that the proper version of prussd.py is running. Disable any previous prussd service:<br>
+1. `sudo systemctl stop prussd.service`<br>
+   `sudo systemctl disable prussd.service`<br>
+2. `sudo bash install.sh --service`<br>
+   `sudo systemctl start prussd.service`<br>
+   `systemctl status prussd.service`
+
 ### `config-pin`: requires changes in uEnv.txt <br>
 HDMI should be disabled. Otherwise this error is encountered:<br>
 ```
@@ -61,14 +70,6 @@ Solution:
 1. `sudo vim /boot/uEnv.txt`.
 2. uncomment the line `disable_uboot_overlay_video=1`
 
-### Install the `prussd.py` Daemon.<br>
-Make sure that the proper version of prussd.py is running. Disable any previous prussd service:<br>
-1. `sudo systemctl stop prussd.service`<br>
-   `sudo systemctl disable prussd.service`<br>
-2. `sudo bash install.sh --service`<br>
-   `sudo systemctl start prussd.service`<br>
-   `systemctl status prussd.service`
-
 ### Make sure that proper paths and symbolic links have been made for clpru and lnkpru.<br>
 The PRU compiler and linker are already installed on the standard images. They are called clpru and lnkpru.<br>
 1. `export PRU_CGT=/usr/share/ti/cgt-pru`
@@ -76,9 +77,11 @@ The PRU compiler and linker are already installed on the standard images. They a
 3. `mkdir -p bin`
 4. `cd bin`
 5. `ln -s `which clpru`  .`
-6. `ln -s ```which lnkpru``` .` <br>
+6. `ln -s ``which lnkpru`` .` <br>
 Refer [https://zeekhuge.me/post/ptp_blinky/](https://zeekhuge.me/post/ptp_blinky/) and [https://groups.google.com/forum/#!topic/beagleboard/MBmIm0EnNfc](https://groups.google.com/forum/#!topic/beagleboard/MBmIm0EnNfc)
 
-### [RPMsg Guide](https://github.com/pratimugale/PRUSS-Bindings/blob/master/Documentation/RPMsg.md)
+### RPMsg Guide
+[/Documentation/RPMsg.md](./Documentation/RPMsg.md)
 
-### [Using SWIG to generate wrapper files.](https://github.com/pratimugale/PRUSS-Bindings/blob/master/Documentation/SWIG.md)
+### Using SWIG to generate wrapper files.
+[/Documentation/SWIG.md](./Documentation/SWIG.md)
