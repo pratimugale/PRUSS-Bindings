@@ -7,7 +7,7 @@ An example made using the API: [https://www.youtube.com/watch?v=W-Kr37lqM98](htt
 Look at a given [example.](https://github.com/pratimugale/PRUSS-Bindings/tree/pruss-api-driver/examples/firmware_examples/example2-rpmsg-pru1/rpmsg_echo.cpp)
 This is how any User Space program will be while using this project. `pruss.cpp` is present in `/cpp-bindings` of this repo.<br>
 The `cpp-bindings` interact with the Python Daemon Service through a UNIX Domain Socket file at `/tmp/pruss.sock` of the Linux file system.<br>
-The `cpp-bindings` passes the appropriate request to the daemon through the socket file. The daemon performs the required PRU-related task with root permissions and sends back the return value. <br>
+The `cpp-bindings` passes the appropriate request to the daemon through the socket file. The `prussd.py` daemon performs the required PRU-related task with root permissions and sends back the return value. <br>
 The bindings for other scripting languages can then be built upon the cpp-bindings using SWIG, which takes C++ declarations and creates wrappers needed to access those declarations from other languages. Bindings have also been provided for 'C' language.<br>
 
 ![Workflow](./Documentation/workflow.jpg?raw=true)
@@ -76,8 +76,8 @@ The PRU compiler and linker are already installed on the standard images. They a
 2. `cd $PRU_CGT`
 3. `mkdir -p bin`
 4. `cd bin`
-5. `ln -s `which clpru`  .`
-6. `ln -s ``which lnkpru`` .` <br>
+5. ln -s which clpru  .
+6. ln -s which lnkpru . <br>
 Refer [https://zeekhuge.me/post/ptp_blinky/](https://zeekhuge.me/post/ptp_blinky/) and [https://groups.google.com/forum/#!topic/beagleboard/MBmIm0EnNfc](https://groups.google.com/forum/#!topic/beagleboard/MBmIm0EnNfc)
 
 ### RPMsg Guide

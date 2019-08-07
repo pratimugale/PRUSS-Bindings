@@ -29,8 +29,9 @@
 #include <linux/rpmsg/virtio_rpmsg.h>
 
 #define PRU_MAX_DEVICES				(8)
-/* Matches the definition in virtio_rpmsg_bus.c */
+// Matches the definition in virtio_rpmsg_bus.c 
 #define RPMSG_BUF_SIZE				(512)
+// Maximum rpmsg buffer size is 512 bytes of which 16 is consumed by the header. Therefore message length = 496 bytes.
 #define MAX_FIFO_MSG				(32)
 #define FIFO_MSG_SIZE				RPMSG_BUF_SIZE
 
@@ -103,6 +104,9 @@ static int pruss_api_release(struct inode *inode, struct file *filp)
 	return 0;
 }
 
+// pruss_api_read is called whenever we read from the character device file in the /dev/ directory. 
+// i.e. when we execute `cat /dev/pruss_api_pru1`
+// This function pulls messages from the kernel fifo and passes them to the user space i.e. cat.
 static ssize_t pruss_api_read(struct file *filp, char __user *buf,
 			      size_t count, loff_t *f_pos)
 {
@@ -128,6 +132,9 @@ static ssize_t pruss_api_read(struct file *filp, char __user *buf,
 	return ret ? ret : length;
 }
 
+// pruss_api_write is called whenever we write to the character device file in the /dev/ directory. 
+// i.e. when we execute `echo "hello" | sudo tee /dev/pruss_api_pru1`
+// This function takes the message and passes it to the PRU core over RPMsg
 static ssize_t pruss_api_write(struct file *filp, const char __user *buf,
 			       size_t count, loff_t *f_pos)
 {
@@ -181,6 +188,8 @@ static const struct file_operations pruss_api_fops = {
 	.poll = pruss_api_poll,
 };
 
+// This is the callback function that is called whenever the PRU core echoes a message to the ARM.
+// The function takes the message and stores it in a fifo in the kernel.
 static int pruss_api_cb(struct rpmsg_device *rpdev, void *data, int len,
 			void *priv, u32 src)
 {
@@ -209,6 +218,7 @@ static int pruss_api_cb(struct rpmsg_device *rpdev, void *data, int len,
 	return 0;
 }
 
+// This function is called once the RPMsg channel is created. It creates the character device file and places it in the /dev/ directory.
 static int pruss_api_probe(struct rpmsg_device *rpdev)
 {
 	int ret;
@@ -225,7 +235,7 @@ static int pruss_api_probe(struct rpmsg_device *rpdev)
 	mutex_unlock(&pruss_api_lock);
 	if (minor_got < 0) {
 		ret = minor_got;
-		dev_err(&rpdev->dev, "Failed to get a minor number for the pruss_api device: %d\n",
+		dev_err(&rpdev->dev, "Failed to get a minor number for the rpsmg device for pruss_api: %d\n",
 			ret);
 		goto fail_alloc_minor;
 	}
@@ -236,14 +246,14 @@ static int pruss_api_probe(struct rpmsg_device *rpdev)
 	prudev->cdev.owner = THIS_MODULE;
 	ret = cdev_add(&prudev->cdev, prudev->devt, 1);
 	if (ret) {
-		dev_err(&rpdev->dev, "Unable to add cdev for the pruss_api device\n");
+		dev_err(&rpdev->dev, "Unable to add cdev for the rpmsg device for pruss_api\n");
 		goto fail_add_cdev;
 	}
 
 	prudev->dev = device_create(pruss_api_class, &rpdev->dev, prudev->devt,
 				    NULL, "pruss_api_pru%d", rpdev->dst);
 	if (IS_ERR(prudev->dev)) {
-		dev_err(&rpdev->dev, "Unable to create the pruss_api device\n");
+		dev_err(&rpdev->dev, "Unable to create the rpmsg device for pruss_api\n");
 		ret = PTR_ERR(prudev->dev);
 		goto fail_create_device;
 	}
@@ -253,7 +263,7 @@ static int pruss_api_probe(struct rpmsg_device *rpdev)
 	ret = kfifo_alloc(&prudev->msg_fifo, MAX_FIFO_MSG * FIFO_MSG_SIZE,
 			  GFP_KERNEL);
 	if (ret) {
-		dev_err(&rpdev->dev, "Unable to allocate fifo for the pruss_api device\n");
+		dev_err(&rpdev->dev, "Unable to allocate fifo for the rpmsg device for pruss_api\n");
 		goto fail_alloc_fifo;
 	}
 
@@ -292,7 +302,7 @@ static void pruss_api_remove(struct rpmsg_device *rpdev)
 	mutex_unlock(&pruss_api_lock);
 }
 
-/* .name matches on RPMsg Channels and causes a probe */
+// .name matches on RPMsg Channels and causes a probe
 static const struct rpmsg_device_id rpmsg_driver_pru_id_table[] = {
 	{ .name	= "pruss-api" },
 	{ },
@@ -354,6 +364,6 @@ module_init(pruss_api_init);
 module_exit(pruss_api_exit);
 
 MODULE_AUTHOR("Jason Reeder <jreeder@ti.com>");
-MODULE_ALIAS("rpmsg:rpmsg-pru");
-MODULE_DESCRIPTION("PRU Remote Processor Messaging Driver");
+MODULE_ALIAS("rpmsg:pruss-api");
+MODULE_DESCRIPTION("Driver to establish RPMsg communication for PRUSS-Bindings using channel name 'pruss_api_pru(ch)'.");
 MODULE_LICENSE("GPL v2");

@@ -1,6 +1,6 @@
 # Makefile for compiling out-of-tree
-# From Free Electrons
-# If on the Bone run apt install linux-headers-`uname -r`
+# Install Linux Headers first by "sudo apt install linux-headers-`uname -r`"
+# Headers should install in /usr/src
 
 KDIR := /lib/modules/$(shell uname -r)/build
 
