@@ -34,7 +34,7 @@ class paths:
     RPROC_DEBUGFS_PATH = "/sys/kernel/debug/remoteproc/remoteproc"
     FIRMWARE_PATH = "/lib/firmware"
     MODPROBE_PATH = "/sbin/modprobe"
-    RPMSG_CHANNELS = ["rpmsg_pru"]
+    RPMSG_CHANNELS = ["pruss_api_pru"]
     FIRMWARE_PATHS = [FIRMWARE_PATH]
 
 
