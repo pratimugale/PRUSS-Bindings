@@ -129,7 +129,7 @@ PRU::PRU(int number, string fw)
 	this->load(fw);
 }
 
-//int PRU::enable()
+int PRU::enable()
 {
 	if(this->state == NONE)
 		return -ENODEV;

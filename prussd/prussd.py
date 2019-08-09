@@ -313,8 +313,6 @@ class ThreadedPRUServer(socketserver.ThreadingMixIn, socketserver.UnixStreamServ
 
 if __name__ == "__main__":
 
-    hello
-
     # if socket exists, unlink/remove it
     try:
         os.remove(paths.SOCK_FILE)
