@@ -1,8 +1,8 @@
-cmd_/home/debian/work/PRUSS-Bindings/drivers/pruss_api.o := gcc -Wp,-MD,/home/debian/work/PRUSS-Bindings/drivers/.pruss_api.o.d  -nostdinc -isystem /usr/lib/gcc/arm-linux-gnueabihf/6/include -I./arch/arm/include -I./arch/arm/include/generated  -I./include -I./arch/arm/include/uapi -I./arch/arm/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h -D__KERNEL__ -mlittle-endian -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -fshort-wchar -Werror-implicit-function-declaration -Wno-format-security -std=gnu89 -fno-PIE -fno-dwarf2-cfi-asm -fno-omit-frame-pointer -mapcs -mno-sched-prolog -fno-ipa-sra -mabi=aapcs-linux -mno-thumb-interwork -mfpu=vfp -funwind-tables -marm -D__LINUX_ARM_ARCH__=7 -march=armv7-a -msoft-float -Uarm -fno-delete-null-pointer-checks -Wno-frame-address -O2 --param=allow-store-data-races=0 -DCC_HAVE_ASM_GOTO -Wframe-larger-than=1024 -fstack-protector-strong -Wno-unused-but-set-variable -Wno-unused-const-variable -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-var-tracking-assignments -pg -Wdeclaration-after-statement -Wno-pointer-sign -fno-strict-overflow -fno-merge-all-constants -fmerge-constants -fno-stack-check -fconserve-stack -Werror=implicit-int -Werror=strict-prototypes -Werror=date-time -Werror=incompatible-pointer-types -Werror=designated-init  -DMODULE  -DKBUILD_BASENAME='"pruss_api"'  -DKBUILD_MODNAME='"pruss_api"' -c -o /home/debian/work/PRUSS-Bindings/drivers/.tmp_pruss_api.o /home/debian/work/PRUSS-Bindings/drivers/pruss_api.c
+cmd_/home/debian/work/PRUSS-Bindings/drivers/rpmsg_client_sample.o := gcc -Wp,-MD,/home/debian/work/PRUSS-Bindings/drivers/.rpmsg_client_sample.o.d  -nostdinc -isystem /usr/lib/gcc/arm-linux-gnueabihf/6/include -I./arch/arm/include -I./arch/arm/include/generated  -I./include -I./arch/arm/include/uapi -I./arch/arm/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h -D__KERNEL__ -mlittle-endian -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -fshort-wchar -Werror-implicit-function-declaration -Wno-format-security -std=gnu89 -fno-PIE -fno-dwarf2-cfi-asm -fno-omit-frame-pointer -mapcs -mno-sched-prolog -fno-ipa-sra -mabi=aapcs-linux -mno-thumb-interwork -mfpu=vfp -funwind-tables -marm -D__LINUX_ARM_ARCH__=7 -march=armv7-a -msoft-float -Uarm -fno-delete-null-pointer-checks -Wno-frame-address -O2 --param=allow-store-data-races=0 -DCC_HAVE_ASM_GOTO -Wframe-larger-than=1024 -fstack-protector-strong -Wno-unused-but-set-variable -Wno-unused-const-variable -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-var-tracking-assignments -pg -Wdeclaration-after-statement -Wno-pointer-sign -fno-strict-overflow -fno-merge-all-constants -fmerge-constants -fno-stack-check -fconserve-stack -Werror=implicit-int -Werror=strict-prototypes -Werror=date-time -Werror=incompatible-pointer-types -Werror=designated-init  -DMODULE  -DKBUILD_BASENAME='"rpmsg_client_sample"'  -DKBUILD_MODNAME='"rpmsg_client_sample"' -c -o /home/debian/work/PRUSS-Bindings/drivers/.tmp_rpmsg_client_sample.o /home/debian/work/PRUSS-Bindings/drivers/rpmsg_client_sample.c
 
-source_/home/debian/work/PRUSS-Bindings/drivers/pruss_api.o := /home/debian/work/PRUSS-Bindings/drivers/pruss_api.c
+source_/home/debian/work/PRUSS-Bindings/drivers/rpmsg_client_sample.o := /home/debian/work/PRUSS-Bindings/drivers/rpmsg_client_sample.c
 
-deps_/home/debian/work/PRUSS-Bindings/drivers/pruss_api.o := \
+deps_/home/debian/work/PRUSS-Bindings/drivers/rpmsg_client_sample.o := \
   include/linux/compiler_types.h \
     $(wildcard include/config/enable/must/check.h) \
     $(wildcard include/config/enable/warn/deprecated.h) \
@@ -130,51 +130,45 @@ deps_/home/debian/work/PRUSS-Bindings/drivers/pruss_api.o := \
   arch/arm/include/asm/div64.h \
   arch/arm/include/asm/compiler.h \
   include/asm-generic/div64.h \
-  include/linux/rpmsg.h \
-    $(wildcard include/config/rpmsg.h) \
-  include/linux/device.h \
-    $(wildcard include/config/debug/devres.h) \
-    $(wildcard include/config/srcu.h) \
-    $(wildcard include/config/generic/msi/irq/domain.h) \
-    $(wildcard include/config/pinctrl.h) \
-    $(wildcard include/config/generic/msi/irq.h) \
-    $(wildcard include/config/numa.h) \
-    $(wildcard include/config/dma/cma.h) \
-    $(wildcard include/config/pm/sleep.h) \
-    $(wildcard include/config/of.h) \
-    $(wildcard include/config/devtmpfs.h) \
-    $(wildcard include/config/sysfs/deprecated.h) \
-  include/linux/ioport.h \
-    $(wildcard include/config/memory/hotremove.h) \
-  include/linux/kobject.h \
-    $(wildcard include/config/uevent/helper.h) \
-    $(wildcard include/config/debug/kobject/release.h) \
+  include/linux/module.h \
+    $(wildcard include/config/sysfs.h) \
+    $(wildcard include/config/modules/tree/lookup.h) \
+    $(wildcard include/config/livepatch.h) \
+    $(wildcard include/config/module/sig.h) \
+    $(wildcard include/config/generic/bug.h) \
+    $(wildcard include/config/kallsyms.h) \
+    $(wildcard include/config/tracepoints.h) \
+    $(wildcard include/config/event/tracing.h) \
+    $(wildcard include/config/module/unload.h) \
+    $(wildcard include/config/constructors.h) \
   include/linux/list.h \
     $(wildcard include/config/debug/list.h) \
   include/linux/poison.h \
     $(wildcard include/config/illegal/pointer/value.h) \
     $(wildcard include/config/page/poisoning/zero.h) \
   include/uapi/linux/const.h \
-  include/linux/sysfs.h \
+  include/linux/stat.h \
+  arch/arm/include/uapi/asm/stat.h \
+  include/uapi/linux/stat.h \
+  include/linux/time.h \
+    $(wildcard include/config/arch/uses/gettimeoffset.h) \
+  include/linux/seqlock.h \
     $(wildcard include/config/debug/lock/alloc.h) \
-    $(wildcard include/config/sysfs.h) \
-  include/linux/kernfs.h \
-    $(wildcard include/config/kernfs.h) \
-  include/linux/err.h \
-  arch/arm/include/generated/uapi/asm/errno.h \
-  include/uapi/asm-generic/errno.h \
-  include/uapi/asm-generic/errno-base.h \
-  include/linux/mutex.h \
-    $(wildcard include/config/mutex/spin/on/owner.h) \
-    $(wildcard include/config/debug/mutexes.h) \
-  arch/arm/include/generated/asm/current.h \
-  include/asm-generic/current.h \
+  include/linux/spinlock.h \
+    $(wildcard include/config/debug/spinlock.h) \
+    $(wildcard include/config/generic/lockbreak.h) \
+    $(wildcard include/config/preempt.h) \
+  include/linux/preempt.h \
+    $(wildcard include/config/preempt/count.h) \
+    $(wildcard include/config/debug/preempt.h) \
+    $(wildcard include/config/preempt/notifiers.h) \
+  arch/arm/include/generated/asm/preempt.h \
+  include/asm-generic/preempt.h \
   include/linux/thread_info.h \
     $(wildcard include/config/thread/info/in/task.h) \
     $(wildcard include/config/have/arch/within/stack/frames.h) \
     $(wildcard include/config/hardened/usercopy.h) \
   include/linux/bug.h \
-    $(wildcard include/config/generic/bug.h) \
     $(wildcard include/config/bug/on/data/corruption.h) \
   arch/arm/include/asm/bug.h \
     $(wildcard include/config/debug/bugverbose.h) \
@@ -224,70 +218,20 @@ deps_/home/debian/work/PRUSS-Bindings/drivers/pruss_api.o := \
     $(wildcard include/config/sparsemem.h) \
   include/linux/pfn.h \
   include/asm-generic/getorder.h \
+  include/linux/bottom_half.h \
   include/linux/spinlock_types.h \
-    $(wildcard include/config/generic/lockbreak.h) \
-    $(wildcard include/config/debug/spinlock.h) \
   arch/arm/include/asm/spinlock_types.h \
   include/linux/lockdep.h \
     $(wildcard include/config/lockdep.h) \
     $(wildcard include/config/lock/stat.h) \
     $(wildcard include/config/lockdep/crossrelease.h) \
   include/linux/rwlock_types.h \
-  include/linux/atomic.h \
-    $(wildcard include/config/generic/atomic64.h) \
-  arch/arm/include/asm/atomic.h \
+  arch/arm/include/asm/spinlock.h \
   include/linux/prefetch.h \
   arch/arm/include/asm/processor.h \
     $(wildcard include/config/have/hw/breakpoint.h) \
     $(wildcard include/config/arm/errata/754327.h) \
   arch/arm/include/asm/hw_breakpoint.h \
-  arch/arm/include/asm/cmpxchg.h \
-    $(wildcard include/config/cpu/sa110.h) \
-    $(wildcard include/config/cpu/v6.h) \
-  include/asm-generic/cmpxchg-local.h \
-  include/asm-generic/atomic-long.h \
-  include/linux/osq_lock.h \
-  include/linux/debug_locks.h \
-    $(wildcard include/config/debug/locking/api/selftests.h) \
-  include/linux/idr.h \
-  include/linux/radix-tree.h \
-    $(wildcard include/config/base/small.h) \
-    $(wildcard include/config/radix/tree/multiorder.h) \
-  include/linux/preempt.h \
-    $(wildcard include/config/preempt/count.h) \
-    $(wildcard include/config/debug/preempt.h) \
-    $(wildcard include/config/preempt.h) \
-    $(wildcard include/config/preempt/notifiers.h) \
-  arch/arm/include/generated/asm/preempt.h \
-  include/asm-generic/preempt.h \
-  include/linux/rcupdate.h \
-    $(wildcard include/config/preempt/rcu.h) \
-    $(wildcard include/config/rcu/stall/common.h) \
-    $(wildcard include/config/no/hz/full.h) \
-    $(wildcard include/config/rcu/nocb/cpu.h) \
-    $(wildcard include/config/tasks/rcu.h) \
-    $(wildcard include/config/tree/rcu.h) \
-    $(wildcard include/config/tiny/rcu.h) \
-    $(wildcard include/config/debug/objects/rcu/head.h) \
-    $(wildcard include/config/hotplug/cpu.h) \
-    $(wildcard include/config/prove/rcu.h) \
-    $(wildcard include/config/rcu/boost.h) \
-    $(wildcard include/config/arch/weak/release/acquire.h) \
-  include/linux/bottom_half.h \
-  include/linux/cpumask.h \
-    $(wildcard include/config/cpumask/offstack.h) \
-    $(wildcard include/config/debug/per/cpu/maps.h) \
-  include/linux/threads.h \
-    $(wildcard include/config/nr/cpus.h) \
-  include/linux/bitmap.h \
-  include/linux/string.h \
-    $(wildcard include/config/binary/printf.h) \
-    $(wildcard include/config/fortify/source.h) \
-  include/uapi/linux/string.h \
-  arch/arm/include/asm/string.h \
-  include/linux/rcutree.h \
-  include/linux/spinlock.h \
-  arch/arm/include/asm/spinlock.h \
   include/linux/rwlock.h \
   include/linux/spinlock_api_smp.h \
     $(wildcard include/config/inline/spin/lock.h) \
@@ -319,10 +263,30 @@ deps_/home/debian/work/PRUSS-Bindings/drivers/pruss_api.o := \
     $(wildcard include/config/inline/write/unlock/irq.h) \
     $(wildcard include/config/inline/read/unlock/irqrestore.h) \
     $(wildcard include/config/inline/write/unlock/irqrestore.h) \
+  include/linux/atomic.h \
+    $(wildcard include/config/generic/atomic64.h) \
+  arch/arm/include/asm/atomic.h \
+  arch/arm/include/asm/cmpxchg.h \
+    $(wildcard include/config/cpu/sa110.h) \
+    $(wildcard include/config/cpu/v6.h) \
+  include/asm-generic/cmpxchg-local.h \
+  include/asm-generic/atomic-long.h \
+  include/linux/math64.h \
+    $(wildcard include/config/arch/supports/int128.h) \
+  include/linux/time64.h \
+  include/uapi/linux/time.h \
+  include/linux/uidgid.h \
+    $(wildcard include/config/multiuser.h) \
+    $(wildcard include/config/user/ns.h) \
+  include/linux/highuid.h \
+  include/linux/kmod.h \
+  include/linux/umh.h \
   include/linux/gfp.h \
     $(wildcard include/config/zone/dma.h) \
     $(wildcard include/config/zone/dma32.h) \
     $(wildcard include/config/zone/device.h) \
+    $(wildcard include/config/numa.h) \
+    $(wildcard include/config/pm/sleep.h) \
     $(wildcard include/config/memory/isolation.h) \
     $(wildcard include/config/compaction.h) \
     $(wildcard include/config/cma.h) \
@@ -347,14 +311,25 @@ deps_/home/debian/work/PRUSS-Bindings/drivers/pruss_api.o := \
     $(wildcard include/config/need/multiple/nodes.h) \
     $(wildcard include/config/have/arch/early/pfn/to/nid.h) \
     $(wildcard include/config/sparsemem/extreme.h) \
+    $(wildcard include/config/memory/hotremove.h) \
     $(wildcard include/config/holes/in/zone.h) \
     $(wildcard include/config/arch/has/holes/memorymodel.h) \
   include/linux/wait.h \
+  arch/arm/include/generated/asm/current.h \
+  include/asm-generic/current.h \
   include/uapi/linux/wait.h \
+  include/linux/threads.h \
+    $(wildcard include/config/nr/cpus.h) \
+    $(wildcard include/config/base/small.h) \
   include/linux/numa.h \
     $(wildcard include/config/nodes/shift.h) \
-  include/linux/seqlock.h \
   include/linux/nodemask.h \
+  include/linux/bitmap.h \
+  include/linux/string.h \
+    $(wildcard include/config/binary/printf.h) \
+    $(wildcard include/config/fortify/source.h) \
+  include/uapi/linux/string.h \
+  arch/arm/include/asm/string.h \
   include/linux/pageblock-flags.h \
     $(wildcard include/config/hugetlb/page.h) \
     $(wildcard include/config/hugetlb/page/size/variable.h) \
@@ -367,14 +342,42 @@ deps_/home/debian/work/PRUSS-Bindings/drivers/pruss_api.o := \
   include/linux/notifier.h \
   include/linux/errno.h \
   include/uapi/linux/errno.h \
+  arch/arm/include/generated/uapi/asm/errno.h \
+  include/uapi/asm-generic/errno.h \
+  include/uapi/asm-generic/errno-base.h \
+  include/linux/mutex.h \
+    $(wildcard include/config/mutex/spin/on/owner.h) \
+    $(wildcard include/config/debug/mutexes.h) \
+  include/linux/osq_lock.h \
+  include/linux/debug_locks.h \
+    $(wildcard include/config/debug/locking/api/selftests.h) \
   include/linux/rwsem.h \
     $(wildcard include/config/rwsem/spin/on/owner.h) \
     $(wildcard include/config/rwsem/generic/spinlock.h) \
+  include/linux/err.h \
   arch/arm/include/generated/asm/rwsem.h \
   include/asm-generic/rwsem.h \
   include/linux/srcu.h \
     $(wildcard include/config/tiny/srcu.h) \
     $(wildcard include/config/tree/srcu.h) \
+    $(wildcard include/config/srcu.h) \
+  include/linux/rcupdate.h \
+    $(wildcard include/config/preempt/rcu.h) \
+    $(wildcard include/config/rcu/stall/common.h) \
+    $(wildcard include/config/no/hz/full.h) \
+    $(wildcard include/config/rcu/nocb/cpu.h) \
+    $(wildcard include/config/tasks/rcu.h) \
+    $(wildcard include/config/tree/rcu.h) \
+    $(wildcard include/config/tiny/rcu.h) \
+    $(wildcard include/config/debug/objects/rcu/head.h) \
+    $(wildcard include/config/hotplug/cpu.h) \
+    $(wildcard include/config/prove/rcu.h) \
+    $(wildcard include/config/rcu/boost.h) \
+    $(wildcard include/config/arch/weak/release/acquire.h) \
+  include/linux/cpumask.h \
+    $(wildcard include/config/cpumask/offstack.h) \
+    $(wildcard include/config/debug/per/cpu/maps.h) \
+  include/linux/rcutree.h \
   include/linux/workqueue.h \
     $(wildcard include/config/debug/objects/work.h) \
     $(wildcard include/config/freezer.h) \
@@ -383,12 +386,6 @@ deps_/home/debian/work/PRUSS-Bindings/drivers/pruss_api.o := \
     $(wildcard include/config/debug/objects/timers.h) \
     $(wildcard include/config/no/hz/common.h) \
   include/linux/ktime.h \
-  include/linux/time.h \
-    $(wildcard include/config/arch/uses/gettimeoffset.h) \
-  include/linux/math64.h \
-    $(wildcard include/config/arch/supports/int128.h) \
-  include/linux/time64.h \
-  include/uapi/linux/time.h \
   include/linux/jiffies.h \
   include/linux/timex.h \
   include/uapi/linux/timex.h \
@@ -429,18 +426,56 @@ deps_/home/debian/work/PRUSS-Bindings/drivers/pruss_api.o := \
   arch/arm/include/asm/topology.h \
     $(wildcard include/config/arm/cpu/topology.h) \
   include/asm-generic/topology.h \
+  include/linux/sysctl.h \
+    $(wildcard include/config/sysctl.h) \
   include/linux/rbtree.h \
+  include/uapi/linux/sysctl.h \
+  include/linux/elf.h \
+  arch/arm/include/asm/elf.h \
+    $(wildcard include/config/vdso.h) \
+  arch/arm/include/asm/auxvec.h \
+  arch/arm/include/uapi/asm/auxvec.h \
+  arch/arm/include/asm/vdso_datapage.h \
+  arch/arm/include/asm/user.h \
+  include/uapi/linux/elf.h \
+  include/uapi/linux/elf-em.h \
+  include/linux/kobject.h \
+    $(wildcard include/config/uevent/helper.h) \
+    $(wildcard include/config/debug/kobject/release.h) \
+  include/linux/sysfs.h \
+  include/linux/kernfs.h \
+    $(wildcard include/config/kernfs.h) \
+  include/linux/idr.h \
+  include/linux/radix-tree.h \
+    $(wildcard include/config/radix/tree/multiorder.h) \
   include/linux/kobject_ns.h \
-  include/linux/stat.h \
-  arch/arm/include/uapi/asm/stat.h \
-  include/uapi/linux/stat.h \
-  include/linux/uidgid.h \
-    $(wildcard include/config/multiuser.h) \
-    $(wildcard include/config/user/ns.h) \
-  include/linux/highuid.h \
   include/linux/kref.h \
   include/linux/refcount.h \
     $(wildcard include/config/refcount/full.h) \
+  include/linux/moduleparam.h \
+    $(wildcard include/config/alpha.h) \
+    $(wildcard include/config/ia64.h) \
+    $(wildcard include/config/ppc64.h) \
+  include/linux/rbtree_latch.h \
+  arch/arm/include/asm/module.h \
+    $(wildcard include/config/arm/unwind.h) \
+    $(wildcard include/config/arm/module/plts.h) \
+  include/asm-generic/module.h \
+    $(wildcard include/config/have/mod/arch/specific.h) \
+    $(wildcard include/config/modules/use/elf/rel.h) \
+    $(wildcard include/config/modules/use/elf/rela.h) \
+  include/linux/rpmsg.h \
+    $(wildcard include/config/rpmsg.h) \
+  include/linux/device.h \
+    $(wildcard include/config/debug/devres.h) \
+    $(wildcard include/config/generic/msi/irq/domain.h) \
+    $(wildcard include/config/pinctrl.h) \
+    $(wildcard include/config/generic/msi/irq.h) \
+    $(wildcard include/config/dma/cma.h) \
+    $(wildcard include/config/of.h) \
+    $(wildcard include/config/devtmpfs.h) \
+    $(wildcard include/config/sysfs/deprecated.h) \
+  include/linux/ioport.h \
   include/linux/klist.h \
   include/linux/pinctrl/devinfo.h \
     $(wildcard include/config/pm.h) \
@@ -495,15 +530,12 @@ deps_/home/debian/work/PRUSS-Bindings/drivers/pruss_api.o := \
     $(wildcard include/config/arch/enable/split/pmd/ptlock.h) \
   include/linux/auxvec.h \
   include/uapi/linux/auxvec.h \
-  arch/arm/include/asm/auxvec.h \
-  arch/arm/include/uapi/asm/auxvec.h \
   include/linux/uprobes.h \
     $(wildcard include/config/uprobes.h) \
   arch/arm/include/asm/uprobes.h \
   arch/arm/include/asm/probes.h \
   arch/arm/include/asm/mmu.h \
     $(wildcard include/config/cpu/has/asid.h) \
-    $(wildcard include/config/vdso.h) \
   include/linux/capability.h \
   include/uapi/linux/capability.h \
   include/linux/semaphore.h \
@@ -540,9 +572,6 @@ deps_/home/debian/work/PRUSS-Bindings/drivers/pruss_api.o := \
     $(wildcard include/config/debug/credentials.h) \
     $(wildcard include/config/keys.h) \
   include/linux/key.h \
-    $(wildcard include/config/sysctl.h) \
-  include/linux/sysctl.h \
-  include/uapi/linux/sysctl.h \
   include/linux/assoc_array.h \
     $(wildcard include/config/associative/array.h) \
   include/linux/selinux.h \
@@ -578,7 +607,6 @@ deps_/home/debian/work/PRUSS-Bindings/drivers/pruss_api.o := \
     $(wildcard include/config/kcov.h) \
     $(wildcard include/config/bcache.h) \
     $(wildcard include/config/vmap/stack.h) \
-    $(wildcard include/config/livepatch.h) \
   include/uapi/linux/sched.h \
   include/linux/sem.h \
   include/uapi/linux/sem.h \
@@ -674,164 +702,7 @@ deps_/home/debian/work/PRUSS-Bindings/drivers/pruss_api.o := \
   include/uapi/linux/poll.h \
   arch/arm/include/generated/uapi/asm/poll.h \
   include/uapi/asm-generic/poll.h \
-  include/linux/slab.h \
-    $(wildcard include/config/debug/slab.h) \
-    $(wildcard include/config/failslab.h) \
-    $(wildcard include/config/have/hardened/usercopy/allocator.h) \
-    $(wildcard include/config/slab.h) \
-    $(wildcard include/config/slub.h) \
-  include/linux/kmemleak.h \
-    $(wildcard include/config/debug/kmemleak.h) \
-  include/linux/vmalloc.h \
-  include/linux/kasan.h \
-  include/linux/cdev.h \
-  include/linux/module.h \
-    $(wildcard include/config/modules/tree/lookup.h) \
-    $(wildcard include/config/module/sig.h) \
-    $(wildcard include/config/kallsyms.h) \
-    $(wildcard include/config/tracepoints.h) \
-    $(wildcard include/config/event/tracing.h) \
-    $(wildcard include/config/module/unload.h) \
-    $(wildcard include/config/constructors.h) \
-  include/linux/kmod.h \
-  include/linux/umh.h \
-  include/linux/elf.h \
-  arch/arm/include/asm/elf.h \
-  arch/arm/include/asm/vdso_datapage.h \
-  arch/arm/include/asm/user.h \
-  include/uapi/linux/elf.h \
-  include/uapi/linux/elf-em.h \
-  include/linux/moduleparam.h \
-    $(wildcard include/config/alpha.h) \
-    $(wildcard include/config/ia64.h) \
-    $(wildcard include/config/ppc64.h) \
-  include/linux/rbtree_latch.h \
-  arch/arm/include/asm/module.h \
-    $(wildcard include/config/arm/unwind.h) \
-    $(wildcard include/config/arm/module/plts.h) \
-  include/asm-generic/module.h \
-    $(wildcard include/config/have/mod/arch/specific.h) \
-    $(wildcard include/config/modules/use/elf/rel.h) \
-    $(wildcard include/config/modules/use/elf/rela.h) \
-  include/linux/kfifo.h \
-  include/linux/scatterlist.h \
-    $(wildcard include/config/debug/sg.h) \
-    $(wildcard include/config/need/sg/dma/length.h) \
-    $(wildcard include/config/arch/has/sg/chain.h) \
-    $(wildcard include/config/sg/pool.h) \
-  include/linux/mm.h \
-    $(wildcard include/config/have/arch/mmap/rnd/bits.h) \
-    $(wildcard include/config/have/arch/mmap/rnd/compat/bits.h) \
-    $(wildcard include/config/mem/soft/dirty.h) \
-    $(wildcard include/config/arch/uses/high/vma/flags.h) \
-    $(wildcard include/config/x86.h) \
-    $(wildcard include/config/x86/intel/memory/protection/keys.h) \
-    $(wildcard include/config/ppc.h) \
-    $(wildcard include/config/parisc.h) \
-    $(wildcard include/config/metag.h) \
-    $(wildcard include/config/x86/intel/mpx.h) \
-    $(wildcard include/config/stack/growsup.h) \
-    $(wildcard include/config/device/private.h) \
-    $(wildcard include/config/device/public.h) \
-    $(wildcard include/config/shmem.h) \
-    $(wildcard include/config/debug/vm/rb.h) \
-    $(wildcard include/config/page/poisoning.h) \
-    $(wildcard include/config/debug/pagealloc.h) \
-    $(wildcard include/config/hibernation.h) \
-    $(wildcard include/config/hugetlbfs.h) \
-  include/linux/range.h \
-  include/linux/percpu-refcount.h \
-  include/linux/page_ext.h \
-    $(wildcard include/config/idle/page/tracking.h) \
-  include/linux/stacktrace.h \
-    $(wildcard include/config/stacktrace.h) \
-    $(wildcard include/config/user/stacktrace/support.h) \
-  include/linux/stackdepot.h \
-  include/linux/page_ref.h \
-    $(wildcard include/config/debug/page/ref.h) \
-  include/linux/page-flags.h \
-    $(wildcard include/config/arch/uses/pg/uncached.h) \
-    $(wildcard include/config/memory/failure.h) \
-    $(wildcard include/config/swap.h) \
-    $(wildcard include/config/thp/swap.h) \
-    $(wildcard include/config/ksm.h) \
-  include/linux/tracepoint-defs.h \
-  include/linux/static_key.h \
-  include/linux/memremap.h \
-  arch/arm/include/asm/pgtable.h \
-    $(wildcard include/config/highpte.h) \
-  arch/arm/include/asm/proc-fns.h \
-  arch/arm/include/asm/glue-proc.h \
-    $(wildcard include/config/cpu/arm7tdmi.h) \
-    $(wildcard include/config/cpu/arm720t.h) \
-    $(wildcard include/config/cpu/arm740t.h) \
-    $(wildcard include/config/cpu/arm9tdmi.h) \
-    $(wildcard include/config/cpu/arm920t.h) \
-    $(wildcard include/config/cpu/arm922t.h) \
-    $(wildcard include/config/cpu/arm925t.h) \
-    $(wildcard include/config/cpu/arm926t.h) \
-    $(wildcard include/config/cpu/arm940t.h) \
-    $(wildcard include/config/cpu/arm946e.h) \
-    $(wildcard include/config/cpu/arm1020.h) \
-    $(wildcard include/config/cpu/arm1020e.h) \
-    $(wildcard include/config/cpu/arm1022.h) \
-    $(wildcard include/config/cpu/arm1026.h) \
-    $(wildcard include/config/cpu/mohawk.h) \
-    $(wildcard include/config/cpu/feroceon.h) \
-    $(wildcard include/config/cpu/v6k.h) \
-    $(wildcard include/config/cpu/pj4b.h) \
-    $(wildcard include/config/cpu/v7.h) \
-  include/asm-generic/pgtable-nopud.h \
-  include/asm-generic/pgtable-nop4d-hack.h \
-  include/asm-generic/5level-fixup.h \
-  arch/arm/include/asm/pgtable-hwdef.h \
-  arch/arm/include/asm/pgtable-2level-hwdef.h \
-  arch/arm/include/asm/tlbflush.h \
-    $(wildcard include/config/smp/on/up.h) \
-    $(wildcard include/config/cpu/tlb/v4wt.h) \
-    $(wildcard include/config/cpu/tlb/fa.h) \
-    $(wildcard include/config/cpu/tlb/v4wbi.h) \
-    $(wildcard include/config/cpu/tlb/feroceon.h) \
-    $(wildcard include/config/cpu/tlb/v4wb.h) \
-    $(wildcard include/config/cpu/tlb/v6.h) \
-    $(wildcard include/config/cpu/tlb/v7.h) \
-    $(wildcard include/config/arm/errata/720789.h) \
-    $(wildcard include/config/arm/errata/798181.h) \
-  arch/arm/include/asm/pgtable-2level.h \
-  include/asm-generic/pgtable.h \
-    $(wildcard include/config/have/arch/transparent/hugepage/pud.h) \
-    $(wildcard include/config/have/arch/soft/dirty.h) \
-    $(wildcard include/config/arch/enable/thp/migration.h) \
-    $(wildcard include/config/have/arch/huge/vmap.h) \
-    $(wildcard include/config/x86/espfix64.h) \
-  include/linux/huge_mm.h \
-  include/linux/sched/coredump.h \
-    $(wildcard include/config/core/dump/default/elf/headers.h) \
-  include/linux/vmstat.h \
-    $(wildcard include/config/vm/event/counters.h) \
-    $(wildcard include/config/debug/tlbflush.h) \
-    $(wildcard include/config/debug/vm/vmacache.h) \
-  include/linux/vm_event_item.h \
-    $(wildcard include/config/memory/balloon.h) \
-    $(wildcard include/config/balloon/compaction.h) \
-  arch/arm/include/asm/io.h \
-    $(wildcard include/config/pci.h) \
-    $(wildcard include/config/need/mach/io/h.h) \
-    $(wildcard include/config/pcmcia/soc/common.h) \
-    $(wildcard include/config/isa.h) \
-    $(wildcard include/config/pccard.h) \
-  include/asm-generic/pci_iomap.h \
-    $(wildcard include/config/no/generic/pci/ioport/map.h) \
-    $(wildcard include/config/generic/pci/iomap.h) \
-  include/xen/xen.h \
-    $(wildcard include/config/xen/pvh.h) \
-    $(wildcard include/config/xen/dom0.h) \
-  include/asm-generic/io.h \
-    $(wildcard include/config/generic/iomap.h) \
-    $(wildcard include/config/has/ioport/map.h) \
-    $(wildcard include/config/virt/to/bus.h) \
-  include/linux/rpmsg/virtio_rpmsg.h \
 
-/home/debian/work/PRUSS-Bindings/drivers/pruss_api.o: $(deps_/home/debian/work/PRUSS-Bindings/drivers/pruss_api.o)
+/home/debian/work/PRUSS-Bindings/drivers/rpmsg_client_sample.o: $(deps_/home/debian/work/PRUSS-Bindings/drivers/rpmsg_client_sample.o)
 
-$(deps_/home/debian/work/PRUSS-Bindings/drivers/pruss_api.o):
+$(deps_/home/debian/work/PRUSS-Bindings/drivers/rpmsg_client_sample.o):
