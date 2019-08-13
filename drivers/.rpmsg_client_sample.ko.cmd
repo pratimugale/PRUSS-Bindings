@@ -1,0 +1,1 @@
+cmd_/home/debian/work/PRUSS-Bindings/drivers/rpmsg_client_sample.ko := ld -EL -r  -T ./scripts/module-common.lds --build-id  -T ./arch/arm/kernel/module.lds -o /home/debian/work/PRUSS-Bindings/drivers/rpmsg_client_sample.ko /home/debian/work/PRUSS-Bindings/drivers/rpmsg_client_sample.o /home/debian/work/PRUSS-Bindings/drivers/rpmsg_client_sample.mod.o ;  true
