@@ -52,9 +52,20 @@ systemd_service() {
 
 }
 
+kernel_driver() {
+	
+	#Install the kernel driver present in drivers/ directory to /lib/modules/$(uname -r) in order to install it
+	sudo cp ./drivers/pruss_api.ko /lib/modules/$(uname -r)/
+	echo "Copying pruss_api.ko to /lib/modules/$(uname -r)"
+	sudo depmod -ae
+	echo "Installed the pruss_api driver"
+
+}
+
 if [ $# -eq 0 ]; then
 	pru_examples
 	systemd_service
+	kernel_driver
 fi
 
 if [ "$1" == "--examples" ] ; then
@@ -63,4 +74,8 @@ fi
 
 if [ "$1" == "--service" ] ; then
 	systemd_service
+fi
+
+if [ "$1" == "--driver" ] ; then
+	kernel_driver
 fi
