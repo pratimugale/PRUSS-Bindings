@@ -56,17 +56,14 @@ volatile register uint32_t __R31;
 #define FROM_ARM_HOST			19
 
 /*
- * Using the name 'rpmsg-client-sample' will probe the RPMsg sample driver
- * found at linux-x.y.z/samples/rpmsg/rpmsg_client_sample.c
- *
- * Using the name 'rpmsg-pru' will probe the rpmsg_pru driver found
- * at linux-x.y.z/drivers/rpmsg/rpmsg_pru.c
+ * Using the name 'pruss-api' will probe the rpmsg_pru driver found
+ * at /lib/modules/$(uname -r)
  */
 
-#define CHAN_NAME			"rpmsg-pru"
+#define CHAN_NAME			"pruss-api"
 
-#define CHAN_DESC			"Channel 31"
-#define CHAN_PORT			31
+#define CHAN_DESC			"Channel 1"
+#define CHAN_PORT			1
 
 /*
  * Used to make sure the Linux drivers are ready for RPMsg communication
@@ -76,10 +73,6 @@ volatile register uint32_t __R31;
 
 // RPMSG_BUF_SIZE = 512 bytes; pru_rpmsg_hdr header is of 16 bytes (minus the data[0] part); so maximum message length is of 496 bytes.
 void* payload[RPMSG_BUF_SIZE];
-
-/*
- * main.c
- */
 
 void main(void)
 {
@@ -124,10 +117,10 @@ void main(void)
                             //*(sram_pointer) = x;
 
                             
-                            for(i = 0; i < 2; i++){
-                                *(sram_pointer+i) = (uint32_t)(uint32_t (*)[2])payload; 
-                            }
-                            //i++;
+                            //*(sram_pointer+i) = (uint32_t)(uint32_t (*)[2])payload; 
+
+			    *(sram_pointer+i) = *(uint32_t*)payload;
+                            i++;
 
                         }
 		}

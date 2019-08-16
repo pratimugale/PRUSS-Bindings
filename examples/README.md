@@ -2,15 +2,25 @@
 
 # Instructions to Run
 
-* Firstly, clone the repository
+* Firstly, clone the repository, this is a fork of Mohammed Muneeb's repository.
 ```
-git clone https://github.com/MuneebMohammed/PRUSS-Bindings
+git clone https://github.com/pratimugale/PRUSS-Bindings
 ```
 * Run the install script 
 ```
 cd PRUSSS-Bindings/
 bash install.sh
 ```
+
+* `cd` into the specific example in the `firmware_examples/` directory and run `make`.
+
+**NOTE**: The code in `archive_userspace_programs` and `/firmware_examples/archive_firmware` were made by a previous student and are not maintained by me. <br>
+To run them, theses are the instructions:
+
+```
+bash install.sh --examples
+```
+Then, 
 * Run the specific example
 
 **Blinky**

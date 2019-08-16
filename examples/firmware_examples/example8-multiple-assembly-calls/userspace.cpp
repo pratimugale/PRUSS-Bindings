@@ -1,4 +1,4 @@
-#include "../../../cpp-bindings/pruss.h"
+#include "pruss.h"
 
 using namespace std;
 

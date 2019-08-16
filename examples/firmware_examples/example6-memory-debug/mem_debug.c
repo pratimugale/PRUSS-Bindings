@@ -1,6 +1,7 @@
-#include "../../../cpp-bindings/pruss.h"
 #include <iostream>
 #include <string>
+
+#include "pruss.h"
 
 using namespace std;
 
@@ -8,7 +9,7 @@ int main()
 {
 	PRUSS& p = PRUSS::get();
 	PRU p0 = p.pru0;
-	//p0.enable();
+
         int x;
         string offset;
         string data;
@@ -16,19 +17,13 @@ int main()
         // Choose which memory access is needed - read the enum from pruss.h
         Memory mem = SHARED;
 
-        // Start
+        // Read the first 10 values of PRU SRAM.
         
         char off[4];
-        for(int i = 0; i < 888; i++){
-            if (i == 102){
-                cout<<"donr --------------------------------";
-            }
+        for(int i = 0; i < 10; i++){
             sprintf(off, "%i", i); 
             cout<<p0.mem_read(mem, off)<<endl;
         }
-
-
-        // END
 
         cout<<"Choose Base Location:"<<endl;
         cout<<"1: DRAM0; 2: DRAM1; 3: SRAM"<<endl;
@@ -70,11 +65,4 @@ int main()
                 break;
         }
 
-        // Then perform actions as desired: 
-
-//      p.bootUp();
-//      p0.enable();
-//      p.restart();
-//	p1.disable();
-//	p.shutDown();
 }

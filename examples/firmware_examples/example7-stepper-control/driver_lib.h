@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <fstream>
 #include <fcntl.h>
-#include "../../../cpp-bindings/pruss.h"
+#include "pruss.h"
 
 #define MAX_FREQUENCY 1000000.0
 #define EXPECTED_MESSAGE "done\n"

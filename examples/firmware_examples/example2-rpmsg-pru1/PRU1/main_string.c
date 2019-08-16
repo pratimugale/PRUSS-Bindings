@@ -46,23 +46,20 @@ volatile register uint32_t __R31;
 #define HOST_INT			((uint32_t) 1 << 31)
 
 /* The PRU-ICSS system events used for RPMsg are defined in the Linux device tree
- * In this lab, PRU1 uses system event 18 (To ARM) and 19 (From ARM)
+ * In this example, PRU1 uses system event 18 (To ARM) and 19 (From ARM)
  */
 #define TO_ARM_HOST			18
 #define FROM_ARM_HOST			19
 
 /*
- * Using the name 'rpmsg-client-sample' will probe the RPMsg sample driver
- * found at linux-x.y.z/samples/rpmsg/rpmsg_client_sample.c
- *
- * Using the name 'rpmsg-pru' will probe the rpmsg_pru driver found
- * at linux-x.y.z/drivers/rpmsg/rpmsg_pru.c
+ * Using the name 'pruss-api' will probe the pruss_api.ko driver found
+ * at /lib/modules/$(uname -r)
  */
 
-#define CHAN_NAME			"rpmsg-pru"
+#define CHAN_NAME			"pruss-api"
 
-#define CHAN_DESC			"Channel 31"
-#define CHAN_PORT			31
+#define CHAN_DESC			"Channel 1"
+#define CHAN_PORT			1
 
 /*
  * Used to make sure the Linux drivers are ready for RPMsg communication
