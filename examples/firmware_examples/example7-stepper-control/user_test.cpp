@@ -8,10 +8,10 @@ int main(){
     Driver& d = Driver::get();
 
     d.wake();
-    d.activateMotor(360.0*60, 170.0, FULL, ANTICLOCKWISE);    // 360 degrees rotate at 60 RPM in Full Step mode, Anticlockwise direction
+    d.activateMotor(360.0, 170.0, FULL, ANTICLOCKWISE);    // 360 degrees rotate at 60 RPM in Full Step mode, Anticlockwise direction
     d.activateMotor(360.0, 60.0, HALF, ANTICLOCKWISE); 
     d.activateMotor(360.0, 60.0, QUARTER, ANTICLOCKWISE); 
-    d.activateMotor(360.0*60, 160.0, EIGHT, ANTICLOCKWISE); 
+    d.activateMotor(360.0, 160.0, EIGHT, ANTICLOCKWISE); 
     d.activateMotor(360.0, 60.0, EIGHT);                  // 360 degrees rotate at 60 RPM in 1/8th Step Mode, Clockwise direction
     d.activateMotor(360.0, 60.0, QUARTER); 
     d.activateMotor(360.0, 60.0, HALF); 
@@ -31,7 +31,9 @@ int main(){
     d.sleep();
     usleep(5000000);
     d.wake();
-    d.activateMotor(360*150.0, 150.0, EIGHT, ANTICLOCKWISE); // To demonstrate RPM accuracy for 150 rotations.
+
+    // To demonstrate RPM accuracy for 150 rotations.
+    d.activateMotor(360*150.0, 150.0, EIGHT, ANTICLOCKWISE); 
 
     return 0;
 }

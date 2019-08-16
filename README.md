@@ -1,4 +1,6 @@
 # PRUSS Bindings - An API to control the BBB PRUs
+[![Build Status](https://travis-ci.org/pratimugale/PRUSS-Bindings.svg?branch=master)](https://travis-ci.org/pratimugale/PRUSS-Bindings)<br>
+
 An API across multiple programming languages to use with the PRUs to load binaries, start/stop, and communicate with the PRUs from the ARM userspace.<br>
 An Introductory Video describing the project: [https://www.youtube.com/watch?v=3Z2PxDIoCpE&t=5s](https://www.youtube.com/watch?v=3Z2PxDIoCpE&t=5s)<br>
 An example made using the API: [https://www.youtube.com/watch?v=W-Kr37lqM98](https://www.youtube.com/watch?v=W-Kr37lqM98)

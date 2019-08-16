@@ -1,6 +1,7 @@
-#include "../../../cpp-bindings/pruss.h"
 #include <iostream>
 #include <math.h>
+
+#include "pruss.h"
 
 using namespace std;
 

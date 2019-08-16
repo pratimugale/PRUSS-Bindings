@@ -237,7 +237,7 @@ def mem_read(ram, cmd):
 
     return data
 
-def mem_write():
+def mem_write(ram, cmd):
     try:
         addr_offset = int(cmd[1], 10)
         data = int(cmd[2], 16)

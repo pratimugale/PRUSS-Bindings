@@ -31,7 +31,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-//This Firmware Code serves as an example to read and deserialize the data written in the message buffer.
+//This Firmware Code serves as an input tool to tell the PRU0 about the next command sent by the ARM to control the stepper motor.
+//This Firmware Code also serves as an example to read and deserialize the data written in the message buffer.
 
 #include <stdint.h>
 #include <stdio.h>
@@ -56,17 +57,14 @@ volatile register uint32_t __R31;
 #define FROM_ARM_HOST			19
 
 /*
- * Using the name 'rpmsg-client-sample' will probe the RPMsg sample driver
- * found at linux-x.y.z/samples/rpmsg/rpmsg_client_sample.c
- *
- * Using the name 'rpmsg-pru' will probe the rpmsg_pru driver found
- * at linux-x.y.z/drivers/rpmsg/rpmsg_pru.c
+ * Using the name 'pruss-api' will probe the pruss_api.ko driver found
+ * /lib/modules/$(uname -r)
  */
 
-#define CHAN_NAME			"rpmsg-pru"
+#define CHAN_NAME			"pruss-api"
 
-#define CHAN_DESC			"Channel 31"
-#define CHAN_PORT			31
+#define CHAN_DESC			"Channel 1"
+#define CHAN_PORT			1
 
 /*
  * Used to make sure the Linux drivers are ready for RPMsg communication

@@ -55,17 +55,25 @@ systemd_service() {
 kernel_driver() {
 	
 	#Install the kernel driver present in drivers/ directory to /lib/modules/$(uname -r) in order to install it
-	sudo cp ./drivers/pruss_api.ko /lib/modules/$(uname -r)/
+	cp ./drivers/pruss_api.ko /lib/modules/$(uname -r)/
 	echo "Copying pruss_api.ko to /lib/modules/$(uname -r)"
-	sudo depmod -ae
+	depmod -ae
 	echo "Installed the pruss_api driver"
 
 }
 
+cpp_bindings() {
+	
+	#Install the headers present in cpp-bindings/ directory to /usr/local/include in order to install it
+	cp "./cpp-bindings/pruss.h" "/usr/local/include/"
+	echo "Copying pruss.h to /usr/local/include"
+
+}
+
 if [ $# -eq 0 ]; then
-	pru_examples
 	systemd_service
 	kernel_driver
+	cpp_bindings
 fi
 
 if [ "$1" == "--examples" ] ; then
@@ -78,4 +86,8 @@ fi
 
 if [ "$1" == "--driver" ] ; then
 	kernel_driver
+fi
+
+if [ "$1" == "--library" ] ; then
+	cpp_bindings
 fi
