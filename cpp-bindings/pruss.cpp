@@ -1,4 +1,5 @@
 #include "pruss.h"
+#include <iostream>
 
 using namespace std;
 
@@ -33,7 +34,7 @@ string Socket::sendcmd(string command)
 	
 	int nbytes;
 	string received;
-	char buf[1024], rec[1024]; //buffers to store command and reply
+	char buf[2048], rec[2048]; //buffers to store command and reply
 	nbytes = snprintf(buf, sizeof(buf), command.c_str()); //store command in buf
 	buf[nbytes] = '\n';
 	send(this->fd, buf, strlen(buf), 0); // send command over the socket connection

@@ -114,9 +114,6 @@ def load_firmware(number, cmd):
     if not os.path.exists(cmd[1]):
         return -errno.ENOENT
 
-    if not any(cmd[1].startswith(path) for path in paths.FIRMWARE_PATHS):
-        return -errno.EPERM
-
     try:
         fname = cmd[1].split("/")[-1]
         fw_path = paths.FIRMWARE_PATH+"/"+fname
