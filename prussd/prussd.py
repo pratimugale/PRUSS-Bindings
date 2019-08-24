@@ -168,8 +168,10 @@ def send_msg(cmd):
     rpmsg_dev = rpmsg_devnode(chan_name, chan_port)
     if chan_name not in paths.RPMSG_CHANNELS:
         return -errno.EPERM
-    if not os.path.exists(rpmsg_dev):
-        return -errno.ENODEV
+
+    while(1):
+        if os.path.exists(rpmsg_dev):
+            break
 
     if mode == 's':
         try:
