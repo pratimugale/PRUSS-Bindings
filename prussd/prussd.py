@@ -20,6 +20,7 @@ import subprocess
 import threading
 import mmap     # For memory functions
 import struct   # For memory functions 
+import time
 
 PRU_ICSS     = 0x4a300000     # This is the address of the PRU Subsystem on the RAM
 PRU_ICSS_SIZE = 512*1024      # This is the length of the PRU subsystem ie it is of 512 K
@@ -168,8 +169,15 @@ def send_msg(cmd):
     rpmsg_dev = rpmsg_devnode(chan_name, chan_port)
     if chan_name not in paths.RPMSG_CHANNELS:
         return -errno.EPERM
-    if not os.path.exists(rpmsg_dev):
-        return -errno.ENODEV
+    
+    time_to_wait = 3
+    time_counter = 0
+
+    while not os.path.exists(rpmsg_dev):
+        time.sleep(1)
+        time_counter += 1
+        if (time_counter >= time_to_wait):
+            return -errno.ENODEV
 
     if mode == 's':
         try:
