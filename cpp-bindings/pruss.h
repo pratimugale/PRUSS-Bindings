@@ -26,7 +26,9 @@ enum Memory
     SHARED = 3
 };
 
-//socket class
+/** 
+ * class Socket
+ */
 class Socket
 {
 	private:
@@ -41,6 +43,9 @@ class Socket
 		friend class PRU; //Only these classes have access to the Socket class
 };
 
+/** 
+ * class PRU
+ */
 class PRU
 {
 	private:
@@ -72,6 +77,9 @@ class PRU
                 std::string mem_write(Memory mem, std::string, std::string);
 };
 
+/** 
+ * class PRUSS
+ */
 class PRUSS
 {
 	private:
