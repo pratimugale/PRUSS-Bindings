@@ -18,79 +18,79 @@ start:                              ; One time setup.
         ;QBA     sample_start
         LDI     R4.w0,  4
         LDI     R4.w2,  5
-        LDI     R5.w0, 6
-        LDI     R5.w2, 7
-        LDI     R6.w0, 8
-        LDI     R6.w2, 9
+        LDI     R5.w0,  6
+        LDI     R5.w2,  7
+        LDI     R6.w0,  8
+        LDI     R6.w2,  9
         LDI     R11.w0, 10
         LDI     R11.w2, 11
 
-sample_start:                       ; 
+sample_start:                        
         
         ;QBLT    same_sample, R5, R11
         ;LDI32   R17, 0
         ;LDI     R11, 3
 
-same_sample:                          ; 
-        LBBO    &R7.b0, R10, R4.w0, 1   ; R7 -> DC of Wave 1
-        ADD     R4.w0, R4.w0, 8        ; Increment offset counter by 1 
+same_sample:                           
+        LBBO    &R7.b0, R10, R4.w0, 1  ; R7 -> DC of Wave 1
+        ADD     R4.w0, R4.w0, 8        ; Increment offset counter by 8
         QBNE    same_sample_1, R7.b0, 150;
         LDI     R4.w0, 4
-        LBBO    &R7.b0, R10, R4.w0, 1   ; R7 -> DC of Wave 1
+        LBBO    &R7.b0, R10, R4.w0, 1   
 
 same_sample_1:
-        LBBO    &R8.b0, R10, R4.w2, 1   ; R7 -> DC of Wave 1
-        ADD     R4.w2, R4.w2, 8        ; Increment offset counter by 1 
+        LBBO    &R8.b0, R10, R4.w2, 1  
+        ADD     R4.w2, R4.w2, 8        
         QBNE    same_sample_2, R8.b0, 150;
         LDI     R4.w2, 5
-        LBBO    &R8.b0, R10, R4.w2, 1   ; R7 -> DC of Wave 1
+        LBBO    &R8.b0, R10, R4.w2, 1 
 
 same_sample_2:
-        LBBO    &R7.b1, R10, R5.w0, 1   ; R7 -> DC of Wave 1
-        ADD     R5.w0, R5.w0, 8        ; Increment offset counter by 1 
+        LBBO    &R7.b1, R10, R5.w0, 1
+        ADD     R5.w0, R5.w0, 8      
         QBNE    same_sample_3, R7.b1, 150;
         LDI     R5.w0, 6
-        LBBO    &R7.b1, R10, R5.w0, 1   ; R7 -> DC of Wave 1
+        LBBO    &R7.b1, R10, R5.w0, 1  
 
 same_sample_3:
-        LBBO    &R8.b1, R10, R5.w2, 1   ; R7 -> DC of Wave 1
-        ADD     R5.w2, R5.w2, 8        ; Increment offset counter by 1 
+        LBBO    &R8.b1, R10, R5.w2, 1 
+        ADD     R5.w2, R5.w2, 8       
         QBNE    same_sample_4, R8.b1, 150;
         LDI     R5.w2, 7
-        LBBO    &R8.b1, R10, R5.w2, 1   ; R7 -> DC of Wave 1
+        LBBO    &R8.b1, R10, R5.w2, 1
 
 same_sample_4:
-        LBBO    &R7.b2, R10, R6.w0, 1   ; R7 -> DC of Wave 1
-        ADD     R6.w0, R6.w0, 8  ; Increment offset counter by 1 
+        LBBO    &R7.b2, R10, R6.w0, 1   
+        ADD     R6.w0, R6.w0, 8   
         QBNE    same_sample_5, R7.b2, 150;
         LDI     R6.w0, 8
-        LBBO    &R7.b2, R10, R6.w0, 1   ; R7 -> DC of Wave 1
+        LBBO    &R7.b2, R10, R6.w0, 1   
 
 same_sample_5:
-        LBBO    &R8.b2, R10, R6.w2, 1   ; R7 -> DC of Wave 1
-        ADD     R6.w2, R6.w2, 8  ; Increment offset counter by 1 
+        LBBO    &R8.b2, R10, R6.w2, 1  
+        ADD     R6.w2, R6.w2, 8   
         QBNE    same_sample_6, R8.b2, 150;
         LDI     R6.w2, 9
-        LBBO    &R8.b2, R10, R6.w2, 1   ; R7 -> DC of Wave 1
+        LBBO    &R8.b2, R10, R6.w2, 1   
 
 same_sample_6:
-        LBBO    &R7.b3, R10, R11.w0, 1   ; R7 -> DC of Wave 1
-        ADD     R11.w0, R11.w0, 8  ; Increment offset counter by 1 
+        LBBO    &R7.b3, R10, R11.w0, 1 
+        ADD     R11.w0, R11.w0, 8   
         QBNE    same_sample_7, R7.b3, 150;
         LDI     R11.w0, 10
-        LBBO    &R7.b3, R10, R11.w0, 1   ; R7 -> DC of Wave 1
+        LBBO    &R7.b3, R10, R11.w0, 1   
 
 same_sample_7:
-        LBBO    &R8.b3, R10, R11.w2, 1   ; R7 -> DC of Wave 1
-        ADD     R11.w2, R11.w2, 8  ; Increment offset counter by 1 
+        LBBO    &R8.b3, R10, R11.w2, 1  
+        ADD     R11.w2, R11.w2, 8   
         QBNE    same_sample_8, R8.b3, 150;
         LDI     R11.w2, 11
-        LBBO    &R8.b3, R10, R11.w2, 1   ; R7 -> DC of Wave 1
+        LBBO    &R8.b3, R10, R11.w2, 1
 
 same_sample_8:
 
-        LDI32   R12, 1212             ; 
-        LDI     R9.w0,  0                ; DC ON counter.
+        LDI32   R12, 1212            
+        LDI     R9.w0,  0             ; DC ON counter.
         LDI     R15, 0                ; DC OFF counter.
         LDI32   R13, 0                ; Pulse counter.
         QBLT    greaterthan_zero1, R7.b0, 1
