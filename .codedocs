@@ -1,7 +1,10 @@
 USE_MDFILE_AS_MAINPAGE = ./README.md
+INCLUDE = cpp-bindings/
+RECURSIVE = YES
+EXCLUDE_PATTERNS = *.c \
+                   *.py 
+IMAGE_PATH = Documentation/
 PROJECT_LOGO = Documentation/beagle_logo.png
-INCLUDE = cpp-bindings/pruss.h
-INCLUDE = cpp-bindings/pruss.c
 PROJECT_NAME           = "PRU User Space API"
 PROJECT_NUMBER         = v1.0.0
 PROJECT_BRIEF          = "An API to control the BeagleBone PRUs using the RemoteProc and RPMsg framework."
