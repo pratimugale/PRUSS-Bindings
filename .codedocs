@@ -3,10 +3,9 @@ RECURSIVE = YES
 EXCLUDE_PATTERNS = *.c \
                    *.py 
 IMAGE_PATH = Documentation/
+USE_MDFILE_AS_MAINPAGE = README.md
 PROJECT_LOGO = Documentation/beagle_logo.png
 PROJECT_NAME           = "PRU User Space API"
 PROJECT_NUMBER         = v1.0.0
 PROJECT_BRIEF          = "An API to control the BeagleBone PRUs using the RemoteProc and RPMsg framework."
 MARKDOWN_SUPPORT       = YES
-USE_MDFILE_AS_MAINPAGE = README.md
-#FILE_PATTERNS = *.h *.cpp *.md
