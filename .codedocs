@@ -1,5 +1,7 @@
 IMAGE_PATH = Documentation/
+HTML_EXTRA_FILES = Documentation/workflow.jpg
 USE_MDFILE_AS_MAINPAGE = README.md
+HTML_EXTRA_FILES = Documentation/workflow.jpg
 PROJECT_NAME           = "PRU User Space API"
 PROJECT_NUMBER         = v1.0.0
 PROJECT_BRIEF          = "An API to control the BeagleBone PRUs using the RemoteProc and RPMsg framework."
