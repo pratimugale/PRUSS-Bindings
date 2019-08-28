@@ -4,8 +4,6 @@ PROJECT_BRIEF          = "An API to control the BeagleBone PRUs using the Remote
 PROJECT_LOGO = Documentation/beagle_logo.png
 INPUT = cpp-bindings/
 RECURSIVE = YES
-EXCLUDE_PATTERNS = *.c \
-                   *.py 
 IMAGE_PATH = Documentation/
 USE_MDFILE_AS_MAINPAGE = ./README.md
 MARKDOWN_SUPPORT       = YES
